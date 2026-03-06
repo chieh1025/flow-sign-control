@@ -14,8 +14,8 @@ import {
 import "@xyflow/react/dist/style.css";
 import { useFSCStore } from "@/store/fsc-store";
 import ProcessNodeComponent from "./ProcessNode";
-import NodeEditor from "./NodeEditor";
-import { AlignVerticalSpaceBetween, Plus } from "lucide-react";
+import { AlignVerticalSpaceBetween, Plus, Pencil, Eye, Save } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const nodeTypes = {
   processNode: ProcessNodeComponent,
@@ -36,8 +36,10 @@ function FlowCanvasInner() {
   const onEdgesChange = useFSCStore((s) => s.onEdgesChange);
   const onConnect = useFSCStore((s) => s.onConnect);
   const setSelectedNodeId = useFSCStore((s) => s.setSelectedNodeId);
-  const setEditingNodeId = useFSCStore((s) => s.setEditingNodeId);
   const addNode = useFSCStore((s) => s.addNode);
+  const editMode = useFSCStore((s) => s.editMode);
+  const setEditMode = useFSCStore((s) => s.setEditMode);
+  const saveSnapshot = useFSCStore((s) => s.saveSnapshot);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const importJSON = useFSCStore((s) => s.importJSON);
   const exportJSON = useFSCStore((s) => s.exportJSON);
@@ -47,7 +49,6 @@ function FlowCanvasInner() {
 
   const handleAutoLayout = useCallback(() => {
     autoLayout();
-    // fitView after a tick so React Flow picks up new positions
     setTimeout(() => fitView({ padding: 0.3 }), 50);
   }, [autoLayout, fitView]);
 
@@ -56,13 +57,6 @@ function FlowCanvasInner() {
       setSelectedNodeId(node.id);
     },
     [setSelectedNodeId]
-  );
-
-  const onNodeDoubleClick = useCallback(
-    (_: React.MouseEvent, node: Node) => {
-      setEditingNodeId(node.id);
-    },
-    [setEditingNodeId]
   );
 
   const onPaneClick = useCallback(() => {
@@ -105,31 +99,36 @@ function FlowCanvasInner() {
     <>
       {/* Toolbar */}
       <div className="absolute top-3 left-3 z-10 flex gap-2">
-        <button onClick={addNode} className={`${btnClass} flex items-center gap-1.5`}>
-          <Plus className="w-3.5 h-3.5" />
-          新增節點
-        </button>
+        {/* Edit mode toggle */}
         <button
-          onClick={handleAutoLayout}
-          className={`${btnClass} flex items-center gap-1.5`}
-          title="自動排版"
+          onClick={() => setEditMode(!editMode)}
+          className={cn(
+            "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs shadow-sm border",
+            editMode
+              ? "bg-blue-500 text-white border-blue-500 hover:bg-blue-600"
+              : "bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
+          )}
         >
-          <AlignVerticalSpaceBetween className="w-3.5 h-3.5" />
-          排版
+          {editMode ? <><Pencil className="w-3.5 h-3.5" /> 編輯中</> : <><Eye className="w-3.5 h-3.5" /> 檢視</>}
         </button>
-        <button onClick={handleExport} className={btnClass}>
-          匯出 JSON
+
+        {editMode && (
+          <>
+            <button onClick={addNode} className={`${btnClass} flex items-center gap-1.5`}>
+              <Plus className="w-3.5 h-3.5" /> 新增節點
+            </button>
+            <button onClick={() => saveSnapshot()} className={`${btnClass} flex items-center gap-1.5`}>
+              <Save className="w-3.5 h-3.5" /> 存版本
+            </button>
+          </>
+        )}
+
+        <button onClick={handleAutoLayout} className={`${btnClass} flex items-center gap-1.5`} title="自動排版">
+          <AlignVerticalSpaceBetween className="w-3.5 h-3.5" /> 排版
         </button>
-        <button onClick={() => fileInputRef.current?.click()} className={btnClass}>
-          匯入 JSON
-        </button>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".json"
-          onChange={handleImport}
-          className="hidden"
-        />
+        <button onClick={handleExport} className={btnClass}>匯出 JSON</button>
+        <button onClick={() => fileInputRef.current?.click()} className={btnClass}>匯入 JSON</button>
+        <input ref={fileInputRef} type="file" accept=".json" onChange={handleImport} className="hidden" />
       </div>
 
       <ReactFlow
@@ -139,10 +138,12 @@ function FlowCanvasInner() {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         onNodeClick={onNodeClick}
-        onNodeDoubleClick={onNodeDoubleClick}
         onPaneClick={onPaneClick}
         nodeTypes={nodeTypes}
         defaultEdgeOptions={defaultEdgeOptions}
+        nodesDraggable={editMode}
+        nodesConnectable={editMode}
+        elementsSelectable
         fitView
         fitViewOptions={{ padding: 0.3 }}
         className="bg-gray-50"
@@ -156,9 +157,6 @@ function FlowCanvasInner() {
           maskColor="rgba(0,0,0,0.08)"
         />
       </ReactFlow>
-
-      {/* Node editor modal */}
-      <NodeEditor />
     </>
   );
 }

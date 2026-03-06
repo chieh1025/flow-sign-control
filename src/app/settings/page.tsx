@@ -184,30 +184,65 @@ function DeptTreeItem({
 function DepartmentTree() {
   const [tree, setTree] = useState<DeptNode[]>([
     {
-      id: "d1",
-      name: "總經理室",
-      children: [],
-    },
-    {
-      id: "d2",
-      name: "管理處",
+      id: "d0",
+      name: "董事長",
       children: [
-        { id: "d2-1", name: "財務部", children: [] },
-        { id: "d2-2", name: "人資部", children: [] },
-        { id: "d2-3", name: "資訊部", children: [] },
+        { id: "d0-1", name: "稽核室", children: [] },
       ],
     },
     {
-      id: "d3",
-      name: "營運處",
+      id: "d1",
+      name: "總經理",
       children: [
-        { id: "d3-1", name: "業務部", children: [] },
-        { id: "d3-2", name: "採購部", children: [] },
         {
-          id: "d3-3",
-          name: "生產部",
+          id: "d2",
+          name: "生產中心",
           children: [
-            { id: "d3-3-1", name: "品管組", children: [] },
+            { id: "d2-1", name: "麵包部", children: [] },
+            { id: "d2-2", name: "西點部", children: [] },
+            { id: "d2-3", name: "包裝部", children: [] },
+            { id: "d2-4", name: "研發部", children: [] },
+            { id: "d2-5", name: "品管部", children: [] },
+            { id: "d2-6", name: "物流倉儲部", children: [] },
+          ],
+        },
+        {
+          id: "d3",
+          name: "營運管理中心",
+          children: [
+            {
+              id: "d3-1",
+              name: "營運部",
+              children: [
+                { id: "d3-1-1", name: "教育訓練課", children: [] },
+                { id: "d3-1-2", name: "區督導", children: [] },
+              ],
+            },
+            {
+              id: "d3-2",
+              name: "開發部",
+              children: [
+                { id: "d3-2-1", name: "工務課", children: [] },
+                { id: "d3-2-2", name: "門市設計課", children: [] },
+              ],
+            },
+            {
+              id: "d3-3",
+              name: "行銷部",
+              children: [
+                { id: "d3-3-1", name: "廣告設計課", children: [] },
+                { id: "d3-3-2", name: "公關客服課", children: [] },
+              ],
+            },
+            { id: "d3-4", name: "人資部", children: [
+              { id: "d3-4-1", name: "文管課", children: [] },
+            ] },
+            { id: "d3-5", name: "財會部", children: [
+              { id: "d3-5-1", name: "會計", children: [] },
+              { id: "d3-5-2", name: "採購課", children: [] },
+              { id: "d3-5-3", name: "總務", children: [] },
+            ] },
+            { id: "d3-6", name: "法務課", children: [] },
           ],
         },
       ],

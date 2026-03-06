@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FSC - Flow Sign Control",
-  description: "企業營運流程簽核控制系統",
+  title: "FSC 流程核決控制平台",
+  description: "Flow & Sign & Control",
 };
 
 export default function RootLayout({

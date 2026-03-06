@@ -18,6 +18,25 @@ import type {
 } from "@/types/fsc";
 import { DEFAULT_DETAIL_PREFERENCES } from "@/types/fsc";
 
+// --- Operation Log ---
+export interface OperationLog {
+  id: string;
+  timestamp: number;
+  action: string;       // e.g. "node.update", "node.add", "node.delete", "flow.import", "flow.save"
+  detail: string;       // human-readable description
+  nodeId?: string;
+  changes?: { field: string; from: string; to: string }[];
+}
+
+// --- Version Snapshot ---
+export interface FlowSnapshot {
+  id: string;
+  timestamp: number;
+  label: string;
+  nodes: Node<ProcessNodeData>[];
+  edges: Edge[];
+}
+
 // Auto-layout with dagre
 function getLayoutedElements(nodes: Node[], edges: Edge[]) {
   const nodeWidth = 280;
@@ -175,25 +194,38 @@ interface FSCState {
   detailPanelOpen: boolean;
   setDetailPanelOpen: (open: boolean) => void;
 
+  // Edit mode
+  editMode: boolean;
+  setEditMode: (on: boolean) => void;
+  editDraft: Partial<ProcessNodeData> | null;  // unsaved changes for selected node
+  setEditDraft: (draft: Partial<ProcessNodeData> | null) => void;
+  saveEditDraft: () => void;
+  discardEditDraft: () => void;
+
   // Sidebar
   sidebarCollapsed: boolean;
   setSidebarCollapsed: (collapsed: boolean) => void;
-
-  // Theme
-  theme: "light" | "dark" | "system";
-  setTheme: (theme: "light" | "dark" | "system") => void;
 
   // Node operations
   updateNodeData: (nodeId: string, data: Partial<ProcessNodeData>) => void;
   addNode: () => void;
   deleteNode: (nodeId: string) => void;
 
-  // Editing
-  editingNodeId: string | null;
-  setEditingNodeId: (id: string | null) => void;
-
   // Layout
   autoLayout: () => void;
+
+  // Operation log
+  operationLogs: OperationLog[];
+  addLog: (action: string, detail: string, nodeId?: string, changes?: OperationLog["changes"]) => void;
+  clearLogs: () => void;
+  loggingEnabled: boolean;
+  setLoggingEnabled: (enabled: boolean) => void;
+
+  // Version snapshots
+  snapshots: FlowSnapshot[];
+  saveSnapshot: (label?: string) => void;
+  restoreSnapshot: (id: string) => void;
+  deleteSnapshot: (id: string) => void;
 
   // Import/Export
   importJSON: (json: { nodes: Node<ProcessNodeData>[]; edges: Edge[]; processName?: string }) => void;
@@ -224,7 +256,11 @@ export const useFSCStore = create<FSCState>()(
       setCurrentProcessName: (name) => set({ currentProcessName: name }),
 
       selectedNodeId: null,
-      setSelectedNodeId: (id) => set({ selectedNodeId: id, detailPanelOpen: id !== null }),
+      setSelectedNodeId: (id) => set({
+        selectedNodeId: id,
+        detailPanelOpen: id !== null,
+        editDraft: null,  // clear draft when switching nodes
+      }),
 
       detailPreferences: DEFAULT_DETAIL_PREFERENCES,
       setDetailPreferences: (prefs) =>
@@ -234,11 +270,62 @@ export const useFSCStore = create<FSCState>()(
       detailPanelOpen: false,
       setDetailPanelOpen: (open) => set({ detailPanelOpen: open }),
 
+      // Edit mode
+      editMode: false,
+      setEditMode: (on) => set({ editMode: on, editDraft: null }),
+      editDraft: null,
+      setEditDraft: (draft) => set({ editDraft: draft }),
+
+      saveEditDraft: () => {
+        const { selectedNodeId, editDraft, nodes, loggingEnabled } = get();
+        if (!selectedNodeId || !editDraft) return;
+
+        const node = nodes.find((n) => n.id === selectedNodeId);
+        if (!node) return;
+        const oldData = node.data as unknown as ProcessNodeData;
+
+        // Compute changes for log
+        const changes: OperationLog["changes"] = [];
+        for (const key of Object.keys(editDraft) as (keyof ProcessNodeData)[]) {
+          const oldVal = JSON.stringify(oldData[key]);
+          const newVal = JSON.stringify(editDraft[key]);
+          if (oldVal !== newVal) {
+            changes.push({
+              field: String(key),
+              from: typeof oldData[key] === "object" ? oldVal : String(oldData[key] ?? ""),
+              to: typeof editDraft[key] === "object" ? newVal : String(editDraft[key] ?? ""),
+            });
+          }
+        }
+
+        if (changes.length === 0) {
+          set({ editDraft: null });
+          return;
+        }
+
+        // Apply
+        set((state) => ({
+          nodes: state.nodes.map((n) =>
+            n.id === selectedNodeId ? { ...n, data: { ...n.data, ...editDraft } } : n
+          ),
+          editDraft: null,
+        }));
+
+        // Log
+        if (loggingEnabled) {
+          get().addLog(
+            "node.update",
+            `更新節點「${oldData.label}」：${changes.map((c) => c.field).join("、")}`,
+            selectedNodeId,
+            changes
+          );
+        }
+      },
+
+      discardEditDraft: () => set({ editDraft: null }),
+
       sidebarCollapsed: false,
       setSidebarCollapsed: (collapsed) => set({ sidebarCollapsed: collapsed }),
-
-      theme: "light",
-      setTheme: (theme) => set({ theme }),
 
       updateNodeData: (nodeId, data) =>
         set((state) => ({
@@ -266,20 +353,35 @@ export const useFSCStore = create<FSCState>()(
             reports: [],
           },
         };
-        set((state) => ({ nodes: [...state.nodes, newNode] }));
-        set({ editingNodeId: id });
+        set((state) => ({
+          nodes: [...state.nodes, newNode],
+          selectedNodeId: id,
+          detailPanelOpen: true,
+          editMode: true,
+          editDraft: { label: "新節點" },
+        }));
+
+        if (get().loggingEnabled) {
+          get().addLog("node.add", "新增節點", id);
+        }
       },
 
-      deleteNode: (nodeId) =>
+      deleteNode: (nodeId) => {
+        const node = get().nodes.find((n) => n.id === nodeId);
+        const label = node ? (node.data as unknown as ProcessNodeData).label : nodeId;
+
         set((state) => ({
           nodes: state.nodes.filter((n) => n.id !== nodeId),
           edges: state.edges.filter((e) => e.source !== nodeId && e.target !== nodeId),
           selectedNodeId: state.selectedNodeId === nodeId ? null : state.selectedNodeId,
           detailPanelOpen: state.selectedNodeId === nodeId ? false : state.detailPanelOpen,
-        })),
+          editDraft: null,
+        }));
 
-      editingNodeId: null,
-      setEditingNodeId: (id) => set({ editingNodeId: id }),
+        if (get().loggingEnabled) {
+          get().addLog("node.delete", `刪除節點「${label}」`, nodeId);
+        }
+      },
 
       autoLayout: () => {
         const { nodes, edges } = get();
@@ -287,11 +389,74 @@ export const useFSCStore = create<FSCState>()(
         set({ nodes: layoutedNodes as Node<ProcessNodeData>[], edges: layoutedEdges });
       },
 
-      importJSON: (json) => set({
-        nodes: json.nodes,
-        edges: json.edges,
-        ...(json.processName ? { currentProcessName: json.processName } : {}),
-      }),
+      // Operation logs
+      operationLogs: [],
+      loggingEnabled: true,
+
+      addLog: (action, detail, nodeId, changes) => {
+        const log: OperationLog = {
+          id: String(Date.now()) + Math.random().toString(36).slice(2, 6),
+          timestamp: Date.now(),
+          action,
+          detail,
+          nodeId,
+          changes,
+        };
+        set((state) => ({
+          operationLogs: [log, ...state.operationLogs].slice(0, 200), // keep last 200
+        }));
+      },
+      clearLogs: () => set({ operationLogs: [] }),
+      setLoggingEnabled: (enabled) => set({ loggingEnabled: enabled }),
+
+      // Version snapshots
+      snapshots: [],
+
+      saveSnapshot: (label) => {
+        const { nodes, edges, currentProcessName } = get();
+        const snap: FlowSnapshot = {
+          id: String(Date.now()),
+          timestamp: Date.now(),
+          label: label || `${currentProcessName} - ${new Date().toLocaleString("zh-TW")}`,
+          nodes: JSON.parse(JSON.stringify(nodes)),
+          edges: JSON.parse(JSON.stringify(edges)),
+        };
+        set((state) => ({ snapshots: [snap, ...state.snapshots].slice(0, 50) }));
+
+        if (get().loggingEnabled) {
+          get().addLog("flow.snapshot", `建立版本快照「${snap.label}」`);
+        }
+      },
+
+      restoreSnapshot: (id) => {
+        const snap = get().snapshots.find((s) => s.id === id);
+        if (!snap) return;
+        set({
+          nodes: JSON.parse(JSON.stringify(snap.nodes)),
+          edges: JSON.parse(JSON.stringify(snap.edges)),
+          selectedNodeId: null,
+          detailPanelOpen: false,
+          editDraft: null,
+        });
+
+        if (get().loggingEnabled) {
+          get().addLog("flow.restore", `還原版本「${snap.label}」`);
+        }
+      },
+
+      deleteSnapshot: (id) =>
+        set((state) => ({ snapshots: state.snapshots.filter((s) => s.id !== id) })),
+
+      importJSON: (json) => {
+        set({
+          nodes: json.nodes,
+          edges: json.edges,
+          ...(json.processName ? { currentProcessName: json.processName } : {}),
+        });
+        if (get().loggingEnabled) {
+          get().addLog("flow.import", "匯入 JSON 流程圖");
+        }
+      },
       exportJSON: () => ({
         nodes: get().nodes,
         edges: get().edges,
@@ -306,7 +471,9 @@ export const useFSCStore = create<FSCState>()(
         currentProcessName: state.currentProcessName,
         detailPreferences: state.detailPreferences,
         sidebarCollapsed: state.sidebarCollapsed,
-        theme: state.theme,
+        operationLogs: state.operationLogs,
+        snapshots: state.snapshots,
+        loggingEnabled: state.loggingEnabled,
       }),
       storage: {
         getItem: (name) => {

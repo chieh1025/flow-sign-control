@@ -6,7 +6,6 @@ import {
   LayoutDashboard,
   GitBranch,
   Shield,
-  AlertTriangle,
   Settings,
   Lock,
   PanelLeftClose,
@@ -17,10 +16,9 @@ import { useFSCStore } from "@/store/fsc-store";
 
 const menuItems = [
   { href: "/", label: "儀表板", icon: LayoutDashboard, exact: true },
-  { href: "/flow", label: "流程管理", icon: GitBranch, exact: false },
-  { href: "/approval", label: "核決權限", icon: Shield, exact: false },
-  { href: "/alerts", label: "警示中心", icon: AlertTriangle, exact: false },
   { href: "/settings", label: "基本設定", icon: Settings, exact: false },
+  { href: "/approval", label: "核決權限", icon: Shield, exact: false },
+  { href: "/flow", label: "流程管理", icon: GitBranch, exact: false },
   { href: "/admin", label: "後台管理", icon: Lock, exact: false },
 ];
 
@@ -39,7 +37,10 @@ export default function Sidebar() {
       {/* Logo */}
       <div className="flex items-center justify-between h-14 px-4 border-b border-gray-100">
         {!collapsed && (
-          <span className="font-bold text-base text-gray-800 tracking-tight">FSC</span>
+          <div className="flex flex-col leading-tight">
+            <span className="font-bold text-sm text-gray-800 tracking-tight">FSC</span>
+            <span className="text-[9px] text-gray-400 tracking-wider">Flow & Sign & Control</span>
+          </div>
         )}
         <button
           onClick={() => setCollapsed(!collapsed)}
