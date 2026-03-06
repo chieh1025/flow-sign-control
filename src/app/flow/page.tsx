@@ -3,6 +3,7 @@
 import Sidebar from "@/components/layout/Sidebar";
 import FlowCanvas from "@/components/flow/FlowCanvas";
 import DetailPanel from "@/components/flow/DetailPanel";
+import EdgeEditor from "@/components/flow/EdgeEditor";
 
 export default function FlowPage() {
   return (
@@ -10,6 +11,7 @@ export default function FlowPage() {
       <Sidebar />
       <FlowCanvas />
       <DetailPanel />
+      <EdgeEditor />
     </div>
   );
 }

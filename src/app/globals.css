@@ -44,3 +44,25 @@ body {
 .react-flow__node {
   cursor: pointer;
 }
+
+.react-flow__edge-text {
+  font-size: 12px;
+  fill: #374151;
+}
+.react-flow__edge-textbg {
+  fill: #f9fafb;
+  rx: 4;
+}
+.dark .react-flow__edge-text {
+  fill: #d1d5db;
+}
+.dark .react-flow__edge-textbg {
+  fill: #1f2937;
+}
+
+.react-flow__edge.selected .react-flow__edge-path {
+  stroke: #3b82f6;
+}
+.react-flow__edge.selected .react-flow__edge-text {
+  fill: #3b82f6;
+}

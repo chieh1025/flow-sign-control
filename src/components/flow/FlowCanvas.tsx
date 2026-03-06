@@ -59,9 +59,22 @@ function FlowCanvasInner() {
     [setSelectedNodeId]
   );
 
+  const selectedEdgeId = useFSCStore((s) => s.selectedEdgeId);
+  const setSelectedEdgeId = useFSCStore((s) => s.setSelectedEdgeId);
+  const updateEdgeLabel = useFSCStore((s) => s.updateEdgeLabel);
+
+  const onEdgeClick = useCallback(
+    (_: React.MouseEvent, edge: { id: string }) => {
+      setSelectedEdgeId(edge.id);
+      setSelectedNodeId(null);
+    },
+    [setSelectedEdgeId, setSelectedNodeId]
+  );
+
   const onPaneClick = useCallback(() => {
     setSelectedNodeId(null);
-  }, [setSelectedNodeId]);
+    setSelectedEdgeId(null);
+  }, [setSelectedNodeId, setSelectedEdgeId]);
 
   const deleteNode = useFSCStore((s) => s.deleteNode);
   const onNodesDelete = useCallback(
@@ -147,6 +160,7 @@ function FlowCanvasInner() {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         onNodeClick={onNodeClick}
+        onEdgeClick={onEdgeClick}
         onPaneClick={onPaneClick}
         nodeTypes={nodeTypes}
         defaultEdgeOptions={defaultEdgeOptions}

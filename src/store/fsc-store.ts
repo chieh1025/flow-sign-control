@@ -187,6 +187,9 @@ interface FSCState {
   // Selection
   selectedNodeId: string | null;
   setSelectedNodeId: (id: string | null) => void;
+  selectedEdgeId: string | null;
+  setSelectedEdgeId: (id: string | null) => void;
+  updateEdgeLabel: (edgeId: string, label: string) => void;
 
   // Detail panel
   detailPreferences: DetailPreferences;
@@ -258,9 +261,18 @@ export const useFSCStore = create<FSCState>()(
       selectedNodeId: null,
       setSelectedNodeId: (id) => set({
         selectedNodeId: id,
+        selectedEdgeId: null,
         detailPanelOpen: id !== null,
-        editDraft: null,  // clear draft when switching nodes
+        editDraft: null,
       }),
+      selectedEdgeId: null,
+      setSelectedEdgeId: (id) => set({ selectedEdgeId: id, selectedNodeId: null, detailPanelOpen: false }),
+      updateEdgeLabel: (edgeId, label) =>
+        set((state) => ({
+          edges: state.edges.map((e) =>
+            e.id === edgeId ? { ...e, label: label || undefined } : e
+          ),
+        })),
 
       detailPreferences: DEFAULT_DETAIL_PREFERENCES,
       setDetailPreferences: (prefs) =>
