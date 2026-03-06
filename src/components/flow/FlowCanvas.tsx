@@ -63,6 +63,15 @@ function FlowCanvasInner() {
     setSelectedNodeId(null);
   }, [setSelectedNodeId]);
 
+  const deleteNode = useFSCStore((s) => s.deleteNode);
+  const onNodesDelete = useCallback(
+    (deleted: Node[]) => {
+      if (!editMode) return;
+      deleted.forEach((n) => deleteNode(n.id));
+    },
+    [editMode, deleteNode]
+  );
+
   const handleExport = useCallback(() => {
     const data = exportJSON();
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
@@ -141,8 +150,11 @@ function FlowCanvasInner() {
         onPaneClick={onPaneClick}
         nodeTypes={nodeTypes}
         defaultEdgeOptions={defaultEdgeOptions}
+        onNodesDelete={onNodesDelete}
+        deleteKeyCode={editMode ? "Delete" : null}
         nodesDraggable={editMode}
         nodesConnectable={editMode}
+        edgesFocusable={editMode}
         elementsSelectable
         fitView
         fitViewOptions={{ padding: 0.3 }}

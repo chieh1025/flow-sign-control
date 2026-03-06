@@ -39,7 +39,7 @@ function ProcessNodeComponent({ id, data, selected }: NodeProps) {
   return (
     <>
       {nodeData.nodeType !== "start" && (
-        <Handle type="target" position={Position.Top} className="!w-2 !h-2 !bg-gray-400 dark:!bg-gray-500" />
+        <Handle type="target" position={Position.Top} className="!w-3 !h-3 !bg-gray-400 dark:!bg-gray-500 hover:!bg-blue-500 !border-2 !border-white dark:!border-gray-800" />
       )}
 
       <div
@@ -97,7 +97,7 @@ function ProcessNodeComponent({ id, data, selected }: NodeProps) {
       </div>
 
       {nodeData.nodeType !== "end" && (
-        <Handle type="source" position={Position.Bottom} className="!w-2 !h-2 !bg-gray-400 dark:!bg-gray-500" />
+        <Handle type="source" position={Position.Bottom} className="!w-3 !h-3 !bg-gray-400 dark:!bg-gray-500 hover:!bg-blue-500 !border-2 !border-white dark:!border-gray-800" />
       )}
     </>
   );
