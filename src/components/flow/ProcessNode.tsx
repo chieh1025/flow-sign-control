@@ -38,8 +38,13 @@ function ProcessNodeComponent({ id, data, selected }: NodeProps) {
 
   return (
     <>
+      {/* Target handles - all 4 sides */}
       {nodeData.nodeType !== "start" && (
-        <Handle type="target" position={Position.Top} className="!w-3 !h-3 !bg-gray-400 dark:!bg-gray-500 hover:!bg-blue-500 !border-2 !border-white dark:!border-gray-800" />
+        <>
+          <Handle id="target-top" type="target" position={Position.Top} className="!w-3 !h-3 !bg-gray-400 dark:!bg-gray-500 hover:!bg-blue-500 !border-2 !border-white dark:!border-gray-800" />
+          <Handle id="target-left" type="target" position={Position.Left} className="!w-3 !h-3 !bg-gray-400 dark:!bg-gray-500 hover:!bg-blue-500 !border-2 !border-white dark:!border-gray-800" />
+          <Handle id="target-right" type="target" position={Position.Right} className="!w-3 !h-3 !bg-gray-400 dark:!bg-gray-500 hover:!bg-blue-500 !border-2 !border-white dark:!border-gray-800" />
+        </>
       )}
 
       <div
@@ -96,8 +101,14 @@ function ProcessNodeComponent({ id, data, selected }: NodeProps) {
         )}
       </div>
 
+      {/* Source handles - all 4 sides */}
       {nodeData.nodeType !== "end" && (
-        <Handle type="source" position={Position.Bottom} className="!w-3 !h-3 !bg-gray-400 dark:!bg-gray-500 hover:!bg-blue-500 !border-2 !border-white dark:!border-gray-800" />
+        <>
+          <Handle id="source-bottom" type="source" position={Position.Bottom} className="!w-3 !h-3 !bg-gray-400 dark:!bg-gray-500 hover:!bg-blue-500 !border-2 !border-white dark:!border-gray-800" />
+          <Handle id="source-left" type="source" position={Position.Left} className="!w-3 !h-3 !bg-gray-400 dark:!bg-gray-500 hover:!bg-blue-500 !border-2 !border-white dark:!border-gray-800" style={{ top: "40%" }} />
+          <Handle id="source-right" type="source" position={Position.Right} className="!w-3 !h-3 !bg-gray-400 dark:!bg-gray-500 hover:!bg-blue-500 !border-2 !border-white dark:!border-gray-800" style={{ top: "40%" }} />
+          <Handle id="source-top" type="source" position={Position.Top} className="!w-3 !h-3 !bg-gray-400 dark:!bg-gray-500 hover:!bg-blue-500 !border-2 !border-white dark:!border-gray-800" />
+        </>
       )}
     </>
   );
