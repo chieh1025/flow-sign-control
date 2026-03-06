@@ -5,6 +5,7 @@ import type { ProcessNodeData, ApprovalAuthority, DetailPreferences, SignMethod,
 import { X, Settings2, ChevronDown, ChevronRight, ArrowUp, ArrowDown, Pencil, Eye, Save, Undo2, Trash2, Plus } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import CommentSection from "./CommentSection";
 
 // --- Helpers ---
 
@@ -272,6 +273,7 @@ export default function DetailPanel() {
   const saveEditDraft = useFSCStore((s) => s.saveEditDraft);
   const discardEditDraft = useFSCStore((s) => s.discardEditDraft);
   const deleteNode = useFSCStore((s) => s.deleteNode);
+  const canEdit = useFSCStore((s) => s.canEdit);
 
   const [sectionOrder, setSectionOrder] = useState<SectionKey[]>(DEFAULT_ORDER);
   const [showDiff, setShowDiff] = useState(false);
@@ -474,13 +476,15 @@ export default function DetailPanel() {
             )}
           </div>
           <div className="flex items-center gap-1 ml-2">
-            <button
-              onClick={() => setEditMode(!editMode)}
-              className={cn("p-1.5 rounded", editMode ? "bg-blue-50 text-blue-600" : "hover:bg-gray-100 text-gray-400")}
-              title={editMode ? "檢視模式" : "編輯模式"}
-            >
-              {editMode ? <Eye className="w-4 h-4" /> : <Pencil className="w-4 h-4" />}
-            </button>
+            {canEdit() && (
+              <button
+                onClick={() => setEditMode(!editMode)}
+                className={cn("p-1.5 rounded", editMode ? "bg-blue-50 text-blue-600" : "hover:bg-gray-100 text-gray-400")}
+                title={editMode ? "檢視模式" : "編輯模式"}
+              >
+                {editMode ? <Eye className="w-4 h-4" /> : <Pencil className="w-4 h-4" />}
+              </button>
+            )}
             <button onClick={() => { setDetailPanelOpen(false); setSelectedNodeId(null); }} className="p-1 rounded hover:bg-gray-100">
               <X className="w-5 h-5 text-gray-400" />
             </button>
@@ -547,6 +551,9 @@ export default function DetailPanel() {
             </Section>
           )}
         </div>
+
+        {/* Comments */}
+        <CommentSection targetId={selectedNodeId} targetType="node" />
       </div>
 
       {/* Diff preview modal */}

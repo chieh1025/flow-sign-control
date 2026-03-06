@@ -4,6 +4,7 @@ import { useFSCStore } from "@/store/fsc-store";
 import type { ProcessNodeData } from "@/types/fsc";
 import { X, GitCommitHorizontal } from "lucide-react";
 import { useState, useEffect } from "react";
+import CommentSection from "./CommentSection";
 
 export default function EdgeEditor() {
   const selectedEdgeId = useFSCStore((s) => s.selectedEdgeId);
@@ -95,6 +96,9 @@ export default function EdgeEditor() {
           </div>
         )}
       </div>
+
+      {/* Comments on edge */}
+      <CommentSection targetId={selectedEdgeId} targetType="edge" />
     </div>
   );
 }

@@ -40,6 +40,8 @@ function FlowCanvasInner() {
   const editMode = useFSCStore((s) => s.editMode);
   const setEditMode = useFSCStore((s) => s.setEditMode);
   const saveSnapshot = useFSCStore((s) => s.saveSnapshot);
+  const canEdit = useFSCStore((s) => s.canEdit);
+  const canManage = useFSCStore((s) => s.canManage);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const importJSON = useFSCStore((s) => s.importJSON);
   const exportJSON = useFSCStore((s) => s.exportJSON);
@@ -121,36 +123,44 @@ function FlowCanvasInner() {
     <>
       {/* Toolbar */}
       <div className="absolute top-3 left-3 z-10 flex gap-2">
-        {/* Edit mode toggle */}
-        <button
-          onClick={() => setEditMode(!editMode)}
-          className={cn(
-            "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs shadow-sm border",
-            editMode
-              ? "bg-blue-500 text-white border-blue-500 hover:bg-blue-600"
-              : "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
-          )}
-        >
-          {editMode ? <><Pencil className="w-3.5 h-3.5" /> 編輯中</> : <><Eye className="w-3.5 h-3.5" /> 檢視</>}
-        </button>
+        {/* Edit mode toggle - only for editor/admin */}
+        {canEdit() && (
+          <button
+            onClick={() => setEditMode(!editMode)}
+            className={cn(
+              "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs shadow-sm border",
+              editMode
+                ? "bg-blue-500 text-white border-blue-500 hover:bg-blue-600"
+                : "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+            )}
+          >
+            {editMode ? <><Pencil className="w-3.5 h-3.5" /> 編輯中</> : <><Eye className="w-3.5 h-3.5" /> 檢視</>}
+          </button>
+        )}
 
-        {editMode && (
+        {editMode && canEdit() && (
           <>
             <button onClick={addNode} className={`${btnClass} flex items-center gap-1.5`}>
               <Plus className="w-3.5 h-3.5" /> 新增節點
             </button>
-            <button onClick={() => saveSnapshot()} className={`${btnClass} flex items-center gap-1.5`}>
-              <Save className="w-3.5 h-3.5" /> 存版本
-            </button>
+            {canManage() && (
+              <button onClick={() => saveSnapshot()} className={`${btnClass} flex items-center gap-1.5`}>
+                <Save className="w-3.5 h-3.5" /> 存版本
+              </button>
+            )}
           </>
         )}
 
         <button onClick={handleAutoLayout} className={`${btnClass} flex items-center gap-1.5`} title="自動排版">
           <AlignVerticalSpaceBetween className="w-3.5 h-3.5" /> 排版
         </button>
-        <button onClick={handleExport} className={btnClass}>匯出 JSON</button>
-        <button onClick={() => fileInputRef.current?.click()} className={btnClass}>匯入 JSON</button>
-        <input ref={fileInputRef} type="file" accept=".json" onChange={handleImport} className="hidden" />
+        {canManage() && (
+          <>
+            <button onClick={handleExport} className={btnClass}>匯出 JSON</button>
+            <button onClick={() => fileInputRef.current?.click()} className={btnClass}>匯入 JSON</button>
+            <input ref={fileInputRef} type="file" accept=".json" onChange={handleImport} className="hidden" />
+          </>
+        )}
       </div>
 
       <ReactFlow

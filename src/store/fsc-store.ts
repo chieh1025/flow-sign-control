@@ -15,8 +15,10 @@ import Dagre from "@dagrejs/dagre";
 import type {
   ProcessNodeData,
   DetailPreferences,
+  Role,
+  Comment,
 } from "@/types/fsc";
-import { DEFAULT_DETAIL_PREFERENCES } from "@/types/fsc";
+import { DEFAULT_DETAIL_PREFERENCES, ROLE_PERMISSIONS } from "@/types/fsc";
 
 // --- Operation Log ---
 export interface OperationLog {
@@ -233,6 +235,19 @@ interface FSCState {
   // Import/Export
   importJSON: (json: { nodes: Node<ProcessNodeData>[]; edges: Edge[]; processName?: string }) => void;
   exportJSON: () => { nodes: Node<ProcessNodeData>[]; edges: Edge[]; processName: string };
+
+  // Role
+  currentRole: Role;
+  setCurrentRole: (role: Role) => void;
+  canEdit: () => boolean;
+  canComment: () => boolean;
+  canManage: () => boolean;
+
+  // Comments
+  comments: Comment[];
+  addComment: (targetId: string, targetType: "node" | "edge", content: string) => void;
+  deleteComment: (commentId: string) => void;
+  getComments: (targetId: string) => Comment[];
 }
 
 export const useFSCStore = create<FSCState>()(
@@ -474,6 +489,38 @@ export const useFSCStore = create<FSCState>()(
         edges: get().edges,
         processName: get().currentProcessName,
       }),
+
+      // Role
+      currentRole: "admin" as Role,
+      setCurrentRole: (role) => set({ currentRole: role }),
+      canEdit: () => ROLE_PERMISSIONS[get().currentRole].canEdit,
+      canComment: () => ROLE_PERMISSIONS[get().currentRole].canComment,
+      canManage: () => ROLE_PERMISSIONS[get().currentRole].canManage,
+
+      // Comments
+      comments: [],
+      addComment: (targetId, targetType, content) => {
+        const comment: Comment = {
+          id: String(Date.now()) + Math.random().toString(36).slice(2, 6),
+          targetId,
+          targetType,
+          author: get().currentRole === "admin" ? "管理員" : "使用者",
+          content,
+          timestamp: Date.now(),
+        };
+        set((state) => ({ comments: [comment, ...state.comments] }));
+
+        if (get().loggingEnabled) {
+          get().addLog(
+            "comment.add",
+            `在${targetType === "node" ? "節點" : "連線"}新增意見：${content.slice(0, 30)}`,
+            targetType === "node" ? targetId : undefined
+          );
+        }
+      },
+      deleteComment: (commentId) =>
+        set((state) => ({ comments: state.comments.filter((c) => c.id !== commentId) })),
+      getComments: (targetId) => get().comments.filter((c) => c.targetId === targetId),
     }),
     {
       name: "fsc-store",
@@ -486,6 +533,8 @@ export const useFSCStore = create<FSCState>()(
         operationLogs: state.operationLogs,
         snapshots: state.snapshots,
         loggingEnabled: state.loggingEnabled,
+        currentRole: state.currentRole,
+        comments: state.comments,
       }),
       storage: {
         getItem: (name) => {

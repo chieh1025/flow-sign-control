@@ -5,6 +5,7 @@ import { Handle, Position, type NodeProps } from "@xyflow/react";
 import type { ProcessNodeData } from "@/types/fsc";
 import { cn } from "@/lib/utils";
 import { useFSCStore } from "@/store/fsc-store";
+import { MessageSquare } from "lucide-react";
 
 const nodeTypeStyles: Record<string, string> = {
   start: "rounded-full border-green-500 bg-green-50 dark:bg-green-950",
@@ -31,6 +32,7 @@ function StatusBadge({ label, color }: { label: string; color: string }) {
 function ProcessNodeComponent({ id, data, selected }: NodeProps) {
   const nodeData = data as unknown as ProcessNodeData;
   const selectedNodeId = useFSCStore((s) => s.selectedNodeId);
+  const commentCount = useFSCStore((s) => s.comments.filter((c) => c.targetId === id).length);
   const isSelected = selectedNodeId === id || selected;
 
   const topApproval = nodeData.approvalAuthorities.find((a) => a.action === "approve");
@@ -49,7 +51,7 @@ function ProcessNodeComponent({ id, data, selected }: NodeProps) {
 
       <div
         className={cn(
-          "border-2 px-4 py-3 w-[260px] shadow-sm transition-all",
+          "relative border-2 px-4 py-3 w-[260px] shadow-sm transition-all",
           style,
           isSelected && "ring-2 ring-blue-400 ring-offset-1 dark:ring-offset-gray-900"
         )}
@@ -97,6 +99,14 @@ function ProcessNodeComponent({ id, data, selected }: NodeProps) {
         {nodeData.nodeType === "end" && (
           <div className="text-sm text-orange-600 dark:text-orange-400 mt-1 font-medium">
             {nodeData.label}
+          </div>
+        )}
+
+        {/* Comment indicator */}
+        {commentCount > 0 && (
+          <div className="absolute -top-2 -right-2 flex items-center gap-0.5 px-1.5 py-0.5 bg-amber-400 text-white rounded-full text-[10px] font-bold shadow-sm">
+            <MessageSquare className="w-2.5 h-2.5" />
+            {commentCount}
           </div>
         )}
       </div>

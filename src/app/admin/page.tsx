@@ -3,7 +3,8 @@
 import Sidebar from "@/components/layout/Sidebar";
 import { useFSCStore, type OperationLog, type FlowSnapshot } from "@/store/fsc-store";
 import { useState } from "react";
-import { Trash2, RotateCcw, Clock, History } from "lucide-react";
+import { Trash2, RotateCcw, Clock, History, Save, Check } from "lucide-react";
+import { ROLE_LABELS, ROLE_PERMISSIONS, type Role } from "@/types/fsc";
 
 function Toggle({ label, desc, checked, onChange }: { label: string; desc: string; checked: boolean; onChange: (v: boolean) => void }) {
   return (
@@ -71,9 +72,12 @@ function SnapshotRow({ snap, onRestore, onDelete }: { snap: FlowSnapshot; onRest
 }
 
 export default function AdminPage() {
-  const [apiEnabled, setApiEnabled] = useState(false);
+  const [apiProvider, setApiProvider] = useState("claude");
+  const [apiKey, setApiKey] = useState("");
+  const [apiEndpoint, setApiEndpoint] = useState("");
   const [jsonImportEnabled, setJsonImportEnabled] = useState(true);
   const [manualFlowEnabled, setManualFlowEnabled] = useState(true);
+  const [saved, setSaved] = useState(false);
   const loggingEnabled = useFSCStore((s) => s.loggingEnabled);
   const setLoggingEnabled = useFSCStore((s) => s.setLoggingEnabled);
   const logs = useFSCStore((s) => s.operationLogs);
@@ -83,6 +87,11 @@ export default function AdminPage() {
   const deleteSnapshot = useFSCStore((s) => s.deleteSnapshot);
 
   const [tab, setTab] = useState<"settings" | "logs" | "versions">("settings");
+
+  const handleSave = () => {
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  };
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -121,32 +130,34 @@ export default function AdminPage() {
               <h3 className="font-semibold text-gray-800 text-sm mb-4">功能開關</h3>
               <div className="space-y-3">
                 <Toggle label="操作紀錄" desc="記錄所有節點編輯、匯入匯出等操作" checked={loggingEnabled} onChange={setLoggingEnabled} />
-                <Toggle label="AI API" desc="啟用後可直接呼叫 AI 產生流程圖" checked={apiEnabled} onChange={setApiEnabled} />
                 <Toggle label="JSON 匯入" desc="允許匯入 JSON 檔案建立流程圖" checked={jsonImportEnabled} onChange={setJsonImportEnabled} />
                 <Toggle label="手動建流程" desc="允許在畫布上手動拖拉建立節點" checked={manualFlowEnabled} onChange={setManualFlowEnabled} />
               </div>
             </div>
 
-            {apiEnabled && (
-              <div className="bg-white border border-gray-200 rounded-lg p-4">
-                <h3 className="font-semibold text-gray-800 text-sm mb-4">AI 設定</h3>
-                <div className="space-y-3">
-                  <div>
-                    <label className="text-sm text-gray-600 block mb-1">Provider</label>
-                    <select className="w-full text-sm px-3 py-2 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-400">
-                      <option>Claude</option>
-                      <option>OpenAI GPT</option>
-                      <option>Ollama (本地)</option>
-                      <option>Gemini</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="text-sm text-gray-600 block mb-1">API Key</label>
-                    <input type="password" placeholder="sk-..." className="w-full text-sm px-3 py-2 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-400" />
-                  </div>
+            <div className="bg-white border border-gray-200 rounded-lg p-4">
+              <h3 className="font-semibold text-gray-800 text-sm mb-4">API 管理</h3>
+              <div className="space-y-3">
+                <div>
+                  <label className="text-sm text-gray-600 block mb-1">Provider</label>
+                  <select value={apiProvider} onChange={(e) => setApiProvider(e.target.value)} className="w-full text-sm px-3 py-2 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-400">
+                    <option value="claude">Claude (Anthropic)</option>
+                    <option value="openai">OpenAI GPT</option>
+                    <option value="ollama">Ollama (本地)</option>
+                    <option value="gemini">Gemini (Google)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-sm text-gray-600 block mb-1">API Key</label>
+                  <input type="password" value={apiKey} onChange={(e) => setApiKey(e.target.value)} placeholder="sk-..." className="w-full text-sm px-3 py-2 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-400" />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-600 block mb-1">Endpoint（選填）</label>
+                  <input type="text" value={apiEndpoint} onChange={(e) => setApiEndpoint(e.target.value)} placeholder="https://api.anthropic.com/v1" className="w-full text-sm px-3 py-2 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-400" />
+                  <p className="text-xs text-gray-400 mt-1">自架 Ollama 或 Proxy 時填寫</p>
                 </div>
               </div>
-            )}
+            </div>
 
             <div className="bg-white border border-gray-200 rounded-lg p-4">
               <h3 className="font-semibold text-gray-800 text-sm mb-4">角色權限</h3>
@@ -156,30 +167,40 @@ export default function AdminPage() {
                     <th className="text-left py-2 font-medium">角色</th>
                     <th className="text-center py-2 font-medium">檢視</th>
                     <th className="text-center py-2 font-medium">編輯</th>
+                    <th className="text-center py-2 font-medium">意見</th>
                     <th className="text-center py-2 font-medium">管理</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="border-b border-gray-50">
-                    <td className="py-2 text-gray-700 font-medium">Admin</td>
-                    <td className="py-2 text-center text-green-600">v</td>
-                    <td className="py-2 text-center text-green-600">v</td>
-                    <td className="py-2 text-center text-green-600">v</td>
-                  </tr>
-                  <tr className="border-b border-gray-50">
-                    <td className="py-2 text-gray-700 font-medium">Manager</td>
-                    <td className="py-2 text-center text-green-600">v</td>
-                    <td className="py-2 text-center text-orange-500">限本部門</td>
-                    <td className="py-2 text-center text-red-400">x</td>
-                  </tr>
-                  <tr>
-                    <td className="py-2 text-gray-700 font-medium">Viewer</td>
-                    <td className="py-2 text-center text-green-600">v</td>
-                    <td className="py-2 text-center text-red-400">x</td>
-                    <td className="py-2 text-center text-red-400">x</td>
-                  </tr>
+                  {(Object.keys(ROLE_LABELS) as Role[]).map((role) => {
+                    const perms = ROLE_PERMISSIONS[role];
+                    const cell = (v: boolean) => (
+                      <td className={`py-2 text-center ${v ? "text-green-600" : "text-red-400"}`}>
+                        {v ? "V" : "X"}
+                      </td>
+                    );
+                    return (
+                      <tr key={role} className="border-b border-gray-50 last:border-b-0">
+                        <td className="py-2 text-gray-700 font-medium">{ROLE_LABELS[role]}</td>
+                        {cell(perms.canView)}
+                        {cell(perms.canEdit)}
+                        {cell(perms.canComment)}
+                        {cell(perms.canManage)}
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
+            </div>
+
+            {/* Save button */}
+            <div className="flex justify-end">
+              <button
+                onClick={handleSave}
+                className="flex items-center gap-2 px-5 py-2.5 bg-blue-500 text-white text-sm font-medium rounded-lg hover:bg-blue-600 transition-colors shadow-sm"
+              >
+                {saved ? <><Check className="w-4 h-4" /> 已儲存</> : <><Save className="w-4 h-4" /> 儲存設定</>}
+              </button>
             </div>
           </div>
         )}

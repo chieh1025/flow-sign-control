@@ -87,6 +87,40 @@ export interface Cycle {
   processes: Process[];
 }
 
+// --- Roles ---
+export type Role = "viewer" | "editor" | "commenter" | "admin";
+
+export interface RolePermissions {
+  canView: boolean;
+  canEdit: boolean;
+  canComment: boolean;
+  canManage: boolean;  // admin: logs, snapshots, import/export, role config
+}
+
+export const ROLE_PERMISSIONS: Record<Role, RolePermissions> = {
+  viewer:    { canView: true,  canEdit: false, canComment: false, canManage: false },
+  commenter: { canView: true,  canEdit: false, canComment: true,  canManage: false },
+  editor:    { canView: true,  canEdit: true,  canComment: true,  canManage: false },
+  admin:     { canView: true,  canEdit: true,  canComment: true,  canManage: true  },
+};
+
+export const ROLE_LABELS: Record<Role, string> = {
+  viewer: "檢視",
+  commenter: "意見",
+  editor: "編輯",
+  admin: "管理",
+};
+
+// --- Comments ---
+export interface Comment {
+  id: string;
+  targetId: string;           // node id or edge id
+  targetType: "node" | "edge";
+  author: string;
+  content: string;
+  timestamp: number;
+}
+
 // 詳情面板顯示偏好
 export interface DetailPreferences {
   operatingSystem: boolean;
