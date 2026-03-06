@@ -14,7 +14,7 @@ import {
 import "@xyflow/react/dist/style.css";
 import { useFSCStore } from "@/store/fsc-store";
 import ProcessNodeComponent from "./ProcessNode";
-import { AlignVerticalSpaceBetween, Plus, Pencil, Eye, Save } from "lucide-react";
+import { AlignVerticalSpaceBetween, Plus, Pencil, Eye, Save, PanelRightClose, PanelRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const nodeTypes = {
@@ -42,6 +42,9 @@ function FlowCanvasInner() {
   const saveSnapshot = useFSCStore((s) => s.saveSnapshot);
   const canEdit = useFSCStore((s) => s.canEdit);
   const canManage = useFSCStore((s) => s.canManage);
+  const detailPanelOpen = useFSCStore((s) => s.detailPanelOpen);
+  const setDetailPanelOpen = useFSCStore((s) => s.setDetailPanelOpen);
+  const selectedNodeId = useFSCStore((s) => s.selectedNodeId);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const importJSON = useFSCStore((s) => s.importJSON);
   const exportJSON = useFSCStore((s) => s.exportJSON);
@@ -162,6 +165,20 @@ function FlowCanvasInner() {
           </>
         )}
       </div>
+
+      {/* Panel toggle */}
+      {selectedNodeId && (
+        <div className="absolute top-3 right-3 z-10">
+          <button
+            onClick={() => setDetailPanelOpen(!detailPanelOpen)}
+            className={`${btnClass} flex items-center gap-1.5`}
+            title={detailPanelOpen ? "收合面板" : "展開面板"}
+          >
+            {detailPanelOpen ? <PanelRightClose className="w-3.5 h-3.5" /> : <PanelRight className="w-3.5 h-3.5" />}
+            {detailPanelOpen ? "收合" : "展開"}
+          </button>
+        </div>
+      )}
 
       <ReactFlow
         nodes={nodes}

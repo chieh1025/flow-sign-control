@@ -51,9 +51,9 @@ function ProcessNodeComponent({ id, data, selected }: NodeProps) {
 
       <div
         className={cn(
-          "relative border-2 px-4 py-3 w-[260px] shadow-sm transition-all",
+          "relative border-2 px-3 py-2.5 w-[220px] shadow-sm transition-all",
           style,
-          isSelected && "ring-2 ring-blue-400 ring-offset-1 dark:ring-offset-gray-900"
+          isSelected && "ring-2 ring-blue-400 ring-offset-1"
         )}
       >
         {/* Badges */}

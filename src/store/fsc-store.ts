@@ -41,10 +41,10 @@ export interface FlowSnapshot {
 
 // Auto-layout with dagre
 function getLayoutedElements(nodes: Node[], edges: Edge[]) {
-  const nodeWidth = 260;
-  const nodeHeight = 120;
+  const nodeWidth = 220;
+  const nodeHeight = 100;
   const g = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
-  g.setGraph({ rankdir: "TB", nodesep: 80, ranksep: 100 });
+  g.setGraph({ rankdir: "TB", nodesep: 60, ranksep: 80 });
 
   nodes.forEach((node) => {
     g.setNode(node.id, { width: nodeWidth, height: nodeHeight });
@@ -524,6 +524,16 @@ export const useFSCStore = create<FSCState>()(
     }),
     {
       name: "fsc-store",
+      version: 2,
+      migrate: (persisted, version) => {
+        const state = persisted as Record<string, unknown>;
+        if (version < 2) {
+          // Add fields introduced in v2
+          if (!state.currentRole) state.currentRole = "admin";
+          if (!state.comments) state.comments = [];
+        }
+        return state as unknown as FSCState;
+      },
       partialize: (state) => ({
         nodes: state.nodes,
         edges: state.edges,
