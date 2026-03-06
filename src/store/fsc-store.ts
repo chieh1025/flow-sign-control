@@ -1,0 +1,327 @@
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+import {
+  type Node,
+  type Edge,
+  applyNodeChanges,
+  applyEdgeChanges,
+  type OnNodesChange,
+  type OnEdgesChange,
+  type Connection,
+  addEdge,
+  MarkerType,
+} from "@xyflow/react";
+import Dagre from "@dagrejs/dagre";
+import type {
+  ProcessNodeData,
+  DetailPreferences,
+} from "@/types/fsc";
+import { DEFAULT_DETAIL_PREFERENCES } from "@/types/fsc";
+
+// Auto-layout with dagre
+function getLayoutedElements(nodes: Node[], edges: Edge[]) {
+  const nodeWidth = 280;
+  const nodeHeight = 140;
+  const g = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
+  g.setGraph({ rankdir: "TB", nodesep: 80, ranksep: 100 });
+
+  nodes.forEach((node) => {
+    g.setNode(node.id, { width: nodeWidth, height: nodeHeight });
+  });
+
+  edges.forEach((edge) => {
+    g.setEdge(edge.source, edge.target);
+  });
+
+  Dagre.layout(g);
+
+  const layoutedNodes = nodes.map((node) => {
+    const pos = g.node(node.id);
+    return {
+      ...node,
+      position: { x: pos.x - nodeWidth / 2, y: pos.y - nodeHeight / 2 },
+    };
+  });
+
+  return { nodes: layoutedNodes, edges };
+}
+
+const defaultEdgeOptions = {
+  markerEnd: { type: MarkerType.ArrowClosed, width: 16, height: 16 },
+  style: { strokeWidth: 2 },
+};
+
+// Demo data
+const DEMO_NODES: Node<ProcessNodeData>[] = [
+  {
+    id: "1",
+    type: "processNode",
+    position: { x: 100, y: 100 },
+    data: {
+      label: "請購申請",
+      nodeType: "start",
+      operatingSystem: "採購模組",
+      signMethod: "system_sign",
+      status: { vacant: false, unsigned: false, paperSign: false, other: "" },
+      controlPoints: ["確認預算餘額", "檢核請購規格"],
+      keyPoints: ["需附需求說明書"],
+      risks: ["未經核准逕行採購"],
+      relatedForms: ["請購單"],
+      approvalAuthorities: [
+        { id: "a1", level: "承辦", levelPerson: "林小華", action: "initiate", isNA: false },
+        { id: "a2", level: "主管", levelPerson: "陳大明", action: "review", isNA: false },
+      ],
+      personnel: [
+        { id: "p1", role: "需求單位承辦", department: "業務部", currentHolder: "林小華", deputy: "張小美" },
+      ],
+      reports: [],
+    },
+  },
+  {
+    id: "2",
+    type: "processNode",
+    position: { x: 100, y: 300 },
+    data: {
+      label: "核決審批",
+      nodeType: "decision",
+      operatingSystem: "簽核系統",
+      signMethod: "paper_sign",
+      status: { vacant: true, unsigned: false, paperSign: true, other: "" },
+      controlPoints: ["請購金額與預算比對", "非預算項目需專案簽核"],
+      keyPoints: ["需比對預算餘額", "超過10萬需處長簽核"],
+      risks: ["超額核決", "代簽未留紀錄"],
+      relatedForms: ["請購單", "預算對照表"],
+      approvalAuthorities: [
+        { id: "a3", level: "部門主管", levelPerson: "王小明", amountMax: 100000, action: "approve", isNA: false },
+        { id: "a4", level: "處長", levelPerson: "張美玲", amountMin: 100000, amountMax: 1000000, action: "approve", isNA: false },
+        { id: "a5", level: "副總", levelPerson: "李大華", amountMin: 1000000, action: "approve", isNA: false },
+      ],
+      personnel: [
+        { id: "p2", role: "部門主管", department: "採購部", currentHolder: "王小明", deputy: "李大華" },
+        { id: "p3", role: "處長", department: "管理處", currentHolder: "張美玲", deputy: "陳志偉" },
+      ],
+      reports: [
+        { id: "r1", reportName: "採購金額月報", reportType: "management", frequency: "monthly", deadline: "每月5日前", outputFormat: "Excel", recipient: "財務長" },
+      ],
+    },
+  },
+  {
+    id: "3",
+    type: "processNode",
+    position: { x: 100, y: 500 },
+    data: {
+      label: "採購執行",
+      nodeType: "task",
+      operatingSystem: "採購模組",
+      signMethod: "system_sign",
+      status: { vacant: false, unsigned: false, paperSign: false, other: "" },
+      controlPoints: ["詢比議價至少三家", "合約條款審查"],
+      keyPoints: ["需附比價單"],
+      risks: ["圍標", "未依合約付款條件"],
+      relatedForms: ["採購單", "比價單", "合約"],
+      approvalAuthorities: [
+        { id: "a6", level: "採購主管", levelPerson: "趙小剛", action: "approve", isNA: false },
+      ],
+      personnel: [
+        { id: "p4", role: "採購人員", department: "採購部", currentHolder: "趙小剛" },
+      ],
+      reports: [],
+    },
+  },
+  {
+    id: "4",
+    type: "processNode",
+    position: { x: 100, y: 700 },
+    data: {
+      label: "進入驗收流程",
+      nodeType: "end",
+      operatingSystem: undefined,
+      signMethod: undefined,
+      status: { vacant: false, unsigned: false, paperSign: false, other: "" },
+      controlPoints: [],
+      keyPoints: [],
+      risks: [],
+      relatedForms: [],
+      approvalAuthorities: [],
+      personnel: [],
+      reports: [],
+    },
+  },
+];
+
+const DEMO_EDGES: Edge[] = [
+  { id: "e1-2", source: "1", target: "2", ...defaultEdgeOptions },
+  { id: "e2-3", source: "2", target: "3", ...defaultEdgeOptions },
+  { id: "e3-4", source: "3", target: "4", ...defaultEdgeOptions },
+];
+
+interface FSCState {
+  // Flow
+  nodes: Node<ProcessNodeData>[];
+  edges: Edge[];
+  currentProcessName: string;
+  onNodesChange: OnNodesChange<Node<ProcessNodeData>>;
+  onEdgesChange: OnEdgesChange;
+  onConnect: (connection: Connection) => void;
+  setCurrentProcessName: (name: string) => void;
+
+  // Selection
+  selectedNodeId: string | null;
+  setSelectedNodeId: (id: string | null) => void;
+
+  // Detail panel
+  detailPreferences: DetailPreferences;
+  setDetailPreferences: (prefs: Partial<DetailPreferences>) => void;
+  detailPanelOpen: boolean;
+  setDetailPanelOpen: (open: boolean) => void;
+
+  // Sidebar
+  sidebarCollapsed: boolean;
+  setSidebarCollapsed: (collapsed: boolean) => void;
+
+  // Theme
+  theme: "light" | "dark" | "system";
+  setTheme: (theme: "light" | "dark" | "system") => void;
+
+  // Node operations
+  updateNodeData: (nodeId: string, data: Partial<ProcessNodeData>) => void;
+  addNode: () => void;
+  deleteNode: (nodeId: string) => void;
+
+  // Editing
+  editingNodeId: string | null;
+  setEditingNodeId: (id: string | null) => void;
+
+  // Layout
+  autoLayout: () => void;
+
+  // Import/Export
+  importJSON: (json: { nodes: Node<ProcessNodeData>[]; edges: Edge[]; processName?: string }) => void;
+  exportJSON: () => { nodes: Node<ProcessNodeData>[]; edges: Edge[]; processName: string };
+}
+
+export const useFSCStore = create<FSCState>()(
+  persist(
+    (set, get) => ({
+      nodes: DEMO_NODES,
+      edges: DEMO_EDGES,
+      currentProcessName: "採購循環-請購至驗收",
+
+      onNodesChange: (changes) => {
+        set({ nodes: applyNodeChanges(changes, get().nodes) as Node<ProcessNodeData>[] });
+      },
+      onEdgesChange: (changes) => {
+        set({ edges: applyEdgeChanges(changes, get().edges) });
+      },
+      onConnect: (connection) => {
+        set({
+          edges: addEdge(
+            { ...connection, ...defaultEdgeOptions },
+            get().edges
+          ),
+        });
+      },
+      setCurrentProcessName: (name) => set({ currentProcessName: name }),
+
+      selectedNodeId: null,
+      setSelectedNodeId: (id) => set({ selectedNodeId: id, detailPanelOpen: id !== null }),
+
+      detailPreferences: DEFAULT_DETAIL_PREFERENCES,
+      setDetailPreferences: (prefs) =>
+        set((state) => ({
+          detailPreferences: { ...state.detailPreferences, ...prefs },
+        })),
+      detailPanelOpen: false,
+      setDetailPanelOpen: (open) => set({ detailPanelOpen: open }),
+
+      sidebarCollapsed: false,
+      setSidebarCollapsed: (collapsed) => set({ sidebarCollapsed: collapsed }),
+
+      theme: "light",
+      setTheme: (theme) => set({ theme }),
+
+      updateNodeData: (nodeId, data) =>
+        set((state) => ({
+          nodes: state.nodes.map((n) =>
+            n.id === nodeId ? { ...n, data: { ...n.data, ...data } } : n
+          ),
+        })),
+
+      addNode: () => {
+        const id = String(Date.now());
+        const newNode: Node<ProcessNodeData> = {
+          id,
+          type: "processNode",
+          position: { x: 200, y: 200 },
+          data: {
+            label: "新節點",
+            nodeType: "task",
+            status: { vacant: false, unsigned: false, paperSign: false, other: "" },
+            controlPoints: [],
+            keyPoints: [],
+            risks: [],
+            relatedForms: [],
+            approvalAuthorities: [],
+            personnel: [],
+            reports: [],
+          },
+        };
+        set((state) => ({ nodes: [...state.nodes, newNode] }));
+        set({ editingNodeId: id });
+      },
+
+      deleteNode: (nodeId) =>
+        set((state) => ({
+          nodes: state.nodes.filter((n) => n.id !== nodeId),
+          edges: state.edges.filter((e) => e.source !== nodeId && e.target !== nodeId),
+          selectedNodeId: state.selectedNodeId === nodeId ? null : state.selectedNodeId,
+          detailPanelOpen: state.selectedNodeId === nodeId ? false : state.detailPanelOpen,
+        })),
+
+      editingNodeId: null,
+      setEditingNodeId: (id) => set({ editingNodeId: id }),
+
+      autoLayout: () => {
+        const { nodes, edges } = get();
+        const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(nodes, edges);
+        set({ nodes: layoutedNodes as Node<ProcessNodeData>[], edges: layoutedEdges });
+      },
+
+      importJSON: (json) => set({
+        nodes: json.nodes,
+        edges: json.edges,
+        ...(json.processName ? { currentProcessName: json.processName } : {}),
+      }),
+      exportJSON: () => ({
+        nodes: get().nodes,
+        edges: get().edges,
+        processName: get().currentProcessName,
+      }),
+    }),
+    {
+      name: "fsc-store",
+      partialize: (state) => ({
+        nodes: state.nodes,
+        edges: state.edges,
+        currentProcessName: state.currentProcessName,
+        detailPreferences: state.detailPreferences,
+        sidebarCollapsed: state.sidebarCollapsed,
+        theme: state.theme,
+      }),
+      storage: {
+        getItem: (name) => {
+          try { const v = localStorage.getItem(name); return v ? JSON.parse(v) : null; }
+          catch { return null; }
+        },
+        setItem: (name, value) => {
+          try { localStorage.setItem(name, JSON.stringify(value)); }
+          catch { /* ignore */ }
+        },
+        removeItem: (name) => {
+          try { localStorage.removeItem(name); }
+          catch { /* ignore */ }
+        },
+      },
+    }
+  )
+);
