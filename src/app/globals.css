@@ -18,14 +18,26 @@
 }
 
 body {
-  background: #ffffff;
-  color: #171717;
+  background: var(--background);
+  color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
 
-.dark body {
-  background: #0a0a0a;
-  color: #ededed;
+/* Dark mode React Flow overrides */
+.dark .react-flow__controls button {
+  background: #1f2937;
+  border-color: #374151;
+  fill: #9ca3af;
+}
+.dark .react-flow__controls button:hover {
+  background: #374151;
+}
+.dark .react-flow__edge-path {
+  stroke: #6b7280;
+}
+.dark .react-flow__arrowhead polyline {
+  stroke: #6b7280;
+  fill: #6b7280;
 }
 
 /* React Flow overrides */

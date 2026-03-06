@@ -27,7 +27,7 @@ const defaultEdgeOptions = {
 };
 
 const btnClass =
-  "px-3 py-1.5 bg-white border border-gray-200 rounded-md text-xs text-gray-600 hover:bg-gray-50 shadow-sm";
+  "px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 shadow-sm";
 
 function FlowCanvasInner() {
   const nodes = useFSCStore((s) => s.nodes);
@@ -106,7 +106,7 @@ function FlowCanvasInner() {
             "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs shadow-sm border",
             editMode
               ? "bg-blue-500 text-white border-blue-500 hover:bg-blue-600"
-              : "bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
+              : "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
           )}
         >
           {editMode ? <><Pencil className="w-3.5 h-3.5" /> 編輯中</> : <><Eye className="w-3.5 h-3.5" /> 檢視</>}
@@ -146,14 +146,14 @@ function FlowCanvasInner() {
         elementsSelectable
         fitView
         fitViewOptions={{ padding: 0.3 }}
-        className="bg-gray-50"
+        className="bg-gray-50 dark:bg-gray-950"
       >
-        <Background gap={20} size={1} color="#e5e7eb" />
+        <Background gap={20} size={1} color="#e5e7eb" className="dark:!stroke-gray-800" />
         <Controls position="bottom-right" />
         <MiniMap
           position="bottom-left"
           nodeStrokeWidth={2}
-          className="!bg-white !border-gray-200"
+          className="!bg-white dark:!bg-gray-800 !border-gray-200 dark:!border-gray-700"
           maskColor="rgba(0,0,0,0.08)"
         />
       </ReactFlow>

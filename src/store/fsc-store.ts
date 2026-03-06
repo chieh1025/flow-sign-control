@@ -39,8 +39,8 @@ export interface FlowSnapshot {
 
 // Auto-layout with dagre
 function getLayoutedElements(nodes: Node[], edges: Edge[]) {
-  const nodeWidth = 280;
-  const nodeHeight = 140;
+  const nodeWidth = 260;
+  const nodeHeight = 120;
   const g = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
   g.setGraph({ rankdir: "TB", nodesep: 80, ranksep: 100 });
 
