@@ -144,7 +144,7 @@ function DeptTreeItem({ node, depth, onAdd, onRemove }: {
 }
 
 // --- Personnel List ---
-interface PersonnelItem { id: string; name: string; account: string; department: string; title: string; role: Role }
+interface PersonnelItem { id: string; name: string; account: string; password: string; department: string; title: string; role: Role }
 
 const TITLES = ["承辦", "主管", "部主管", "處主管", "總經理", "董事長", "董事會"];
 const DEPARTMENTS = [
@@ -155,23 +155,24 @@ const DEPARTMENTS = [
 ];
 
 function PersonnelList() {
+  const DEFAULT_PASSWORD = "89455989";
   const [personnel, setPersonnel] = useState<PersonnelItem[]>([
-    { id: "p1", name: "林小華", account: "lin.xh", department: "營運部", title: "承辦", role: "editor" },
-    { id: "p2", name: "陳大明", account: "chen.dm", department: "營運部", title: "主管", role: "editor" },
-    { id: "p3", name: "王小明", account: "wang.xm", department: "採購課", title: "部主管", role: "editor" },
-    { id: "p4", name: "張美玲", account: "zhang.ml", department: "財會部", title: "處主管", role: "admin" },
-    { id: "p5", name: "趙小剛", account: "zhao.xg", department: "採購課", title: "承辦", role: "commenter" },
-    { id: "p6", name: "江廠長", account: "jiang.cz", department: "生產中心", title: "處主管", role: "admin" },
-    { id: "p7", name: "陳副總", account: "chen.fz", department: "營運管理中心", title: "總經理", role: "admin" },
+    { id: "p1", name: "林小華", account: "lin.xh", password: DEFAULT_PASSWORD, department: "營運部", title: "承辦", role: "editor" },
+    { id: "p2", name: "陳大明", account: "chen.dm", password: DEFAULT_PASSWORD, department: "營運部", title: "主管", role: "editor" },
+    { id: "p3", name: "王小明", account: "wang.xm", password: DEFAULT_PASSWORD, department: "採購課", title: "部主管", role: "editor" },
+    { id: "p4", name: "張美玲", account: "zhang.ml", password: DEFAULT_PASSWORD, department: "財會部", title: "處主管", role: "admin" },
+    { id: "p5", name: "趙小剛", account: "zhao.xg", password: DEFAULT_PASSWORD, department: "採購課", title: "承辦", role: "commenter" },
+    { id: "p6", name: "江廠長", account: "jiang.cz", password: DEFAULT_PASSWORD, department: "生產中心", title: "處主管", role: "admin" },
+    { id: "p7", name: "陳副總", account: "chen.fz", password: DEFAULT_PASSWORD, department: "營運管理中心", title: "總經理", role: "admin" },
   ]);
   const [adding, setAdding] = useState(false);
-  const [form, setForm] = useState<Omit<PersonnelItem, "id">>({ name: "", account: "", department: DEPARTMENTS[0], title: TITLES[0], role: "viewer" });
+  const [form, setForm] = useState<Omit<PersonnelItem, "id">>({ name: "", account: "", password: DEFAULT_PASSWORD, department: DEPARTMENTS[0], title: TITLES[0], role: "commenter" });
   const selectClass = "text-sm px-3 py-2 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white";
 
   const handleAdd = () => {
-    if (!form.name.trim() || !form.account.trim()) return;
+    if (!form.name.trim()) return;
     setPersonnel([...personnel, { id: `p-${Date.now()}`, ...form }]);
-    setForm({ name: "", account: "", department: DEPARTMENTS[0], title: TITLES[0], role: "viewer" });
+    setForm({ name: "", account: "", password: DEFAULT_PASSWORD, department: DEPARTMENTS[0], title: TITLES[0], role: "commenter" });
     setAdding(false);
   };
 
@@ -185,9 +186,10 @@ function PersonnelList() {
       </div>
 
       {adding && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4 grid grid-cols-5 gap-3">
-          <input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="姓名*" className={selectClass} />
-          <input type="text" value={form.account} onChange={(e) => setForm({ ...form, account: e.target.value })} placeholder="帳號*" className={selectClass} />
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4 grid grid-cols-3 gap-3">
+          <input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="姓名 *" className={selectClass} />
+          <input type="text" value={form.account} onChange={(e) => setForm({ ...form, account: e.target.value })} placeholder="帳號（選填）" className={selectClass} />
+          <input type="text" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} placeholder="密碼" className={selectClass} />
           <select value={form.department} onChange={(e) => setForm({ ...form, department: e.target.value })} className={selectClass}>
             {DEPARTMENTS.map((d) => <option key={d} value={d}>{d}</option>)}
           </select>
@@ -198,7 +200,7 @@ function PersonnelList() {
             <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value as Role })} className={`flex-1 ${selectClass}`}>
               {(Object.keys(ROLE_LABELS) as Role[]).map((r) => <option key={r} value={r}>{ROLE_LABELS[r]}</option>)}
             </select>
-            <button onClick={handleAdd} className="px-3 py-2 bg-blue-500 text-white text-xs rounded hover:bg-blue-600">加入</button>
+            <button onClick={handleAdd} className="px-3 py-2 bg-blue-500 text-white text-xs rounded hover:bg-blue-600 whitespace-nowrap">加入</button>
           </div>
         </div>
       )}
@@ -209,6 +211,7 @@ function PersonnelList() {
             <tr className="border-b bg-gray-50 text-gray-500">
               <th className="text-left py-2.5 px-4 font-medium">姓名</th>
               <th className="text-left py-2.5 px-4 font-medium">帳號</th>
+              <th className="text-left py-2.5 px-4 font-medium">密碼</th>
               <th className="text-left py-2.5 px-4 font-medium">部門</th>
               <th className="text-left py-2.5 px-4 font-medium">職稱</th>
               <th className="text-left py-2.5 px-4 font-medium">權限</th>
@@ -219,7 +222,15 @@ function PersonnelList() {
             {personnel.map((p) => (
               <tr key={p.id} className="border-b border-gray-50 group hover:bg-gray-50">
                 <td className="py-2.5 px-4 text-gray-800 font-medium">{p.name}</td>
-                <td className="py-2.5 px-4 text-gray-500 font-mono text-xs">{p.account}</td>
+                <td className="py-2.5 px-4 text-gray-500 font-mono text-xs">{p.account || <span className="text-gray-300">-</span>}</td>
+                <td className="py-2.5 px-4">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-gray-400 text-xs">{"••••••"}</span>
+                    {p.password !== DEFAULT_PASSWORD && <span className="text-[10px] text-green-600">已修改</span>}
+                    <button onClick={() => { if (confirm(`重設「${p.name}」的密碼為預設值？`)) setPersonnel(personnel.map((x) => x.id === p.id ? { ...x, password: DEFAULT_PASSWORD } : x)); }}
+                      className="opacity-0 group-hover:opacity-100 text-[10px] text-blue-500 hover:underline">重設</button>
+                  </div>
+                </td>
                 <td className="py-2.5 px-4 text-gray-600">{p.department}</td>
                 <td className="py-2.5 px-4 text-gray-600">{p.title}</td>
                 <td className="py-2.5 px-4">
