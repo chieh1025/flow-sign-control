@@ -22,12 +22,13 @@ const nodeTypes = {
 };
 
 const defaultEdgeOptions = {
-  markerEnd: { type: MarkerType.ArrowClosed, width: 16, height: 16 },
-  style: { strokeWidth: 2 },
+  markerEnd: { type: MarkerType.ArrowClosed, width: 14, height: 14 },
+  style: { strokeWidth: 1.5 },
 };
 
-const btnClass =
-  "px-3 py-1.5 bg-surface border border-border rounded-md text-xs text-text-secondary hover:bg-surface-hover shadow-sm";
+// ── Toolbar button styles ──
+const btnBase = "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 cursor-pointer";
+const btnDefault = `${btnBase} bg-surface/80 backdrop-blur-sm border border-border text-text-secondary hover:bg-surface-hover hover:text-text shadow-sm`;
 
 function FlowCanvasInner() {
   const nodes = useFSCStore((s) => s.nodes);
@@ -124,59 +125,72 @@ function FlowCanvasInner() {
 
   return (
     <>
-      {/* Toolbar */}
-      <div className="absolute top-3 left-3 z-10 flex gap-2">
-        {/* Edit mode toggle - only for editor/admin */}
+      {/* ── Floating Toolbar ── */}
+      <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 p-1.5 rounded-xl bg-surface/70 backdrop-blur-md border border-border/60 shadow-lg">
+        {/* Edit mode toggle */}
         {canEdit() && (
           <button
             onClick={() => setEditMode(!editMode)}
             className={cn(
-              "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs shadow-sm border",
+              btnBase,
               editMode
-                ? "bg-primary text-white border-primary hover:opacity-90"
-                : "bg-surface border-border text-text-secondary hover:bg-surface-hover"
+                ? "bg-primary text-white shadow-sm hover:opacity-90"
+                : "text-text-secondary hover:bg-surface-hover hover:text-text"
             )}
           >
             {editMode ? <><Pencil className="w-3.5 h-3.5" /> 編輯中</> : <><Eye className="w-3.5 h-3.5" /> 檢視</>}
           </button>
         )}
 
+        {/* Separator */}
+        {canEdit() && <div className="w-px h-5 bg-border" />}
+
         {editMode && canEdit() && (
           <>
-            <button onClick={addNode} className={`${btnClass} flex items-center gap-1.5`}>
-              <Plus className="w-3.5 h-3.5" /> 新增節點
+            <button onClick={addNode} className={`${btnBase} text-text-secondary hover:bg-surface-hover hover:text-text`}>
+              <Plus className="w-3.5 h-3.5" /> 新增
             </button>
             {canManage() && (
-              <button onClick={() => saveSnapshot()} className={`${btnClass} flex items-center gap-1.5`}>
+              <button onClick={() => saveSnapshot()} className={`${btnBase} text-text-secondary hover:bg-surface-hover hover:text-text`}>
                 <Save className="w-3.5 h-3.5" /> 存版本
               </button>
             )}
+            <div className="w-px h-5 bg-border" />
           </>
         )}
 
-        <button onClick={handleAutoLayout} className={`${btnClass} flex items-center gap-1.5`} title="自動排版">
+        <button onClick={handleAutoLayout} className={`${btnBase} text-text-secondary hover:bg-surface-hover hover:text-text`} title="自動排版">
           <AlignVerticalSpaceBetween className="w-3.5 h-3.5" /> 排版
         </button>
+
         {canManage() && (
           <>
-            <button onClick={handleExport} className={btnClass}>匯出 JSON</button>
-            <button onClick={() => fileInputRef.current?.click()} className={btnClass}>匯入 JSON</button>
+            <div className="w-px h-5 bg-border" />
+            <button onClick={handleExport} className={`${btnBase} text-text-secondary hover:bg-surface-hover hover:text-text`}>匯出</button>
+            <button onClick={() => fileInputRef.current?.click()} className={`${btnBase} text-text-secondary hover:bg-surface-hover hover:text-text`}>匯入</button>
             <input ref={fileInputRef} type="file" accept=".json" onChange={handleImport} className="hidden" />
           </>
         )}
       </div>
 
-      {/* Panel toggle */}
+      {/* ── Panel toggle ── */}
       {selectedNodeId && (
         <div className="absolute top-3 right-3 z-10">
           <button
             onClick={() => setDetailPanelOpen(!detailPanelOpen)}
-            className={`${btnClass} flex items-center gap-1.5`}
+            className={btnDefault}
             title={detailPanelOpen ? "收合面板" : "展開面板"}
           >
             {detailPanelOpen ? <PanelRightClose className="w-3.5 h-3.5" /> : <PanelRight className="w-3.5 h-3.5" />}
             {detailPanelOpen ? "收合" : "展開"}
           </button>
+        </div>
+      )}
+
+      {/* ── Edit mode indicator ── */}
+      {editMode && (
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[11px] font-medium backdrop-blur-sm">
+          編輯模式 — 可拖曳節點、新增連線
         </div>
       )}
 
@@ -199,15 +213,20 @@ function FlowCanvasInner() {
         elementsSelectable
         fitView
         fitViewOptions={{ padding: 0.3 }}
-        className="bg-background"
+        className={cn("bg-background transition-colors duration-300", editMode && "bg-primary-bg/30")}
       >
-        <Background gap={20} size={1} color="var(--border)" />
+        <Background
+          gap={20}
+          size={editMode ? 1.5 : 1}
+          color={editMode ? "var(--primary)" : "var(--border)"}
+          style={{ opacity: editMode ? 0.15 : 1 }}
+        />
         <Controls position="bottom-right" />
         <MiniMap
           position="bottom-left"
           nodeStrokeWidth={2}
-          className="!bg-surface !border-border"
-          maskColor="rgba(0,0,0,0.08)"
+          className="!bg-surface/80 !backdrop-blur-sm !border-border !rounded-lg !shadow-lg"
+          maskColor="rgba(0,0,0,0.1)"
         />
       </ReactFlow>
     </>
