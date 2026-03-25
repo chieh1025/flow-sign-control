@@ -7,30 +7,31 @@ import { cn } from "@/lib/utils";
 import { useFSCStore } from "@/store/fsc-store";
 import { MessageSquare } from "lucide-react";
 
-// ── Node styles — solid backgrounds, clear in both modes ──
-const nodeTypeStyles: Record<string, string> = {
-  start: "rounded-3xl border-emerald-400 dark:border-emerald-500 bg-emerald-50 dark:bg-emerald-900/80",
-  end: "rounded-3xl border-orange-400 dark:border-orange-500 bg-orange-50 dark:bg-orange-900/80",
-  task: "rounded-lg border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800",
-  decision: "rounded-lg border-violet-400 dark:border-violet-400 bg-violet-50 dark:bg-violet-900/70",
-  connector: "rounded-full border-amber-400 dark:border-amber-500 bg-amber-50 dark:bg-amber-900/80",
+// ── Left stripe color by node type ──
+const stripeColor: Record<string, string> = {
+  start: "border-l-emerald-500",
+  end: "border-l-orange-500",
+  task: "border-l-blue-500",
+  decision: "border-l-violet-500",
+  connector: "border-l-amber-500",
 };
 
-const signMethodLabel: Record<string, { text: string; color: string }> = {
-  system_sign: { text: "系統簽", color: "bg-emerald-100 text-emerald-800 dark:bg-emerald-800/60 dark:text-emerald-300" },
-  paper_sign: { text: "紙本簽", color: "bg-orange-100 text-orange-800 dark:bg-orange-800/60 dark:text-orange-300" },
-  both: { text: "系統+紙本", color: "bg-sky-100 text-sky-800 dark:bg-sky-800/60 dark:text-sky-300" },
+// ── Shape by node type ──
+const shapeClass: Record<string, string> = {
+  start: "rounded-2xl",
+  end: "rounded-2xl",
+  task: "rounded-lg",
+  decision: "rounded-lg",
+  connector: "rounded-full",
 };
 
-const handleClass = "!w-2 !h-2 !bg-slate-400 dark:!bg-slate-500 hover:!bg-blue-500 !border-[1.5px] !border-white dark:!border-slate-800 transition-colors";
+const signMethodLabel: Record<string, string> = {
+  system_sign: "系統簽",
+  paper_sign: "紙本簽",
+  both: "系統+紙本",
+};
 
-function StatusBadge({ label, color }: { label: string; color: string }) {
-  return (
-    <span className={cn("inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium leading-none whitespace-nowrap", color)}>
-      {label}
-    </span>
-  );
-}
+const handleClass = "!w-2 !h-2 !bg-slate-300 dark:!bg-slate-600 hover:!bg-blue-500 !border-[1.5px] !border-white dark:!border-slate-800 transition-colors";
 
 function ProcessNodeComponent({ id, data, selected }: NodeProps) {
   const nodeData = data as unknown as ProcessNodeData;
@@ -39,9 +40,17 @@ function ProcessNodeComponent({ id, data, selected }: NodeProps) {
   const isSelected = selectedNodeId === id || selected;
 
   const topApproval = nodeData.approvalAuthorities.find((a) => a.action === "approve");
-  const style = nodeTypeStyles[nodeData.nodeType] || nodeTypeStyles.task;
+  const stripe = stripeColor[nodeData.nodeType] || stripeColor.task;
+  const shape = shapeClass[nodeData.nodeType] || shapeClass.task;
 
-  const hasBadges = nodeData.operatingSystem || nodeData.signMethod || nodeData.status.vacant || nodeData.status.unsigned || nodeData.status.paperSign || nodeData.status.other;
+  // Collect status tags
+  const tags: string[] = [];
+  if (nodeData.operatingSystem) tags.push(nodeData.operatingSystem);
+  if (nodeData.signMethod && signMethodLabel[nodeData.signMethod]) tags.push(signMethodLabel[nodeData.signMethod]);
+  if (nodeData.status.vacant) tags.push("缺人");
+  if (nodeData.status.unsigned) tags.push("未簽");
+  if (nodeData.status.paperSign) tags.push("紙本簽");
+  if (nodeData.status.other) tags.push(nodeData.status.other);
 
   return (
     <>
@@ -56,64 +65,60 @@ function ProcessNodeComponent({ id, data, selected }: NodeProps) {
 
       <div
         className={cn(
-          "relative border-2 px-3 py-2 w-[220px] transition-all duration-150 cursor-pointer",
-          "shadow-[0_1px_3px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)]",
-          "hover:shadow-[0_4px_12px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_4px_16px_rgba(0,0,0,0.5)]",
-          "hover:border-blue-400/50 dark:hover:border-blue-400/50",
-          style,
-          isSelected && "ring-2 ring-blue-400 dark:ring-blue-500 ring-offset-2 ring-offset-white dark:ring-offset-slate-900 shadow-[0_4px_12px_rgba(0,0,0,0.15)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.5)]"
+          // Base card
+          "relative w-[220px] bg-white dark:bg-slate-800 cursor-pointer transition-all duration-150",
+          // Left stripe
+          "border-l-4", stripe,
+          // Other borders
+          "border-t border-r border-b border-slate-200 dark:border-slate-700",
+          // Shape
+          shape,
+          // Shadow elevation
+          "shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.06)]",
+          "dark:shadow-[0_2px_6px_rgba(0,0,0,0.3),0_1px_3px_rgba(0,0,0,0.2)]",
+          // Hover
+          "hover:shadow-[0_4px_12px_rgba(0,0,0,0.1),0_2px_4px_rgba(0,0,0,0.06)]",
+          "dark:hover:shadow-[0_6px_20px_rgba(0,0,0,0.4),0_2px_6px_rgba(0,0,0,0.3)]",
+          "hover:border-slate-300 dark:hover:border-slate-600",
+          // Selected
+          isSelected && "ring-2 ring-blue-500 dark:ring-blue-400 ring-offset-2 ring-offset-white dark:ring-offset-slate-900 shadow-[0_4px_12px_rgba(59,130,246,0.15)] dark:shadow-[0_4px_16px_rgba(96,165,250,0.2)]"
         )}
       >
-        {/* Badges row */}
-        {hasBadges && (
-          <div className="flex flex-wrap gap-1 mb-1">
-            {nodeData.operatingSystem && (
-              <StatusBadge label={nodeData.operatingSystem} color="bg-sky-100 text-sky-800 dark:bg-sky-800/60 dark:text-sky-300" />
-            )}
-            {nodeData.signMethod && signMethodLabel[nodeData.signMethod] && (
-              <StatusBadge
-                label={signMethodLabel[nodeData.signMethod].text}
-                color={signMethodLabel[nodeData.signMethod].color}
-              />
-            )}
-            {nodeData.status.vacant && (
-              <StatusBadge label="缺人" color="bg-red-100 text-red-800 dark:bg-red-800/60 dark:text-red-300" />
-            )}
-            {nodeData.status.unsigned && (
-              <StatusBadge label="未簽" color="bg-amber-100 text-amber-800 dark:bg-amber-800/60 dark:text-amber-300" />
-            )}
-            {nodeData.status.paperSign && (
-              <StatusBadge label="紙本簽" color="bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300" />
-            )}
-            {nodeData.status.other && (
-              <StatusBadge label={nodeData.status.other} color="bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300" />
-            )}
-          </div>
-        )}
-
-        {/* Node name */}
-        <div className="font-medium text-[13px] text-slate-800 dark:text-slate-100 leading-tight">{nodeData.label}</div>
-
-        {/* Top approval summary */}
-        {topApproval && (
-          <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-tight">
-            {topApproval.amountMax
-              ? `≤ ${(topApproval.amountMax / 10000).toFixed(0)}萬 `
-              : ""}
-            {topApproval.level}（{topApproval.levelPerson}）
-          </div>
-        )}
-
-        {/* End node sublabel */}
-        {nodeData.nodeType === "end" && (
-          <div className="text-[11px] text-orange-600 dark:text-orange-400 mt-0.5 font-medium leading-tight">
+        <div className="px-3 py-2">
+          {/* Node name */}
+          <div className="font-medium text-[13px] text-slate-800 dark:text-slate-100 leading-tight">
             {nodeData.label}
           </div>
-        )}
+
+          {/* Approval summary */}
+          {topApproval && (
+            <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-tight">
+              {topApproval.amountMax ? `≤ ${(topApproval.amountMax / 10000).toFixed(0)}萬 ` : ""}
+              {topApproval.level}（{topApproval.levelPerson}）
+            </div>
+          )}
+
+          {/* Status tags — simple dot + text, no colored badges */}
+          {tags.length > 0 && (
+            <div className="flex flex-wrap gap-x-2 gap-y-0.5 mt-1">
+              {tags.map((tag, i) => (
+                <span key={i} className="flex items-center gap-1 text-[10px] text-slate-400 dark:text-slate-500">
+                  <span className={cn(
+                    "w-1.5 h-1.5 rounded-full",
+                    tag === "缺人" ? "bg-red-500" :
+                    tag === "未簽" ? "bg-amber-500" :
+                    "bg-slate-300 dark:bg-slate-600"
+                  )} />
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
 
         {/* Comment indicator */}
         {commentCount > 0 && (
-          <div className="absolute -top-1.5 -right-1.5 flex items-center gap-0.5 px-1 py-0.5 bg-amber-500 text-white rounded-full text-[9px] font-bold shadow">
+          <div className="absolute -top-1.5 -right-1.5 flex items-center gap-0.5 px-1 py-0.5 bg-blue-500 text-white rounded-full text-[9px] font-bold shadow">
             <MessageSquare className="w-2 h-2" />
             {commentCount}
           </div>
