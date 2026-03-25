@@ -29,32 +29,32 @@ export default function EdgeEditor() {
   const targetName = targetNode ? (targetNode.data as unknown as ProcessNodeData).label : edge.target;
 
   return (
-    <div className="w-80 border-l border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-shrink-0 overflow-y-auto">
+    <div className="w-80 border-l border-border bg-surface flex-shrink-0 overflow-y-auto">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-800">
+      <div className="flex items-center justify-between p-4 border-b border-border-light">
         <div className="flex items-center gap-2">
-          <GitCommitHorizontal className="w-4 h-4 text-gray-400" />
-          <h3 className="font-bold text-sm text-gray-800 dark:text-gray-100">連線設定</h3>
+          <GitCommitHorizontal className="w-4 h-4 text-text-muted" />
+          <h3 className="font-bold text-sm text-text">連線設定</h3>
         </div>
-        <button onClick={() => setSelectedEdgeId(null)} className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800">
-          <X className="w-4 h-4 text-gray-400" />
+        <button onClick={() => setSelectedEdgeId(null)} className="p-1 rounded hover:bg-surface-hover">
+          <X className="w-4 h-4 text-text-muted" />
         </button>
       </div>
 
       <div className="p-4 space-y-4">
         {/* From → To */}
         <div className="text-sm">
-          <div className="text-gray-400 text-xs mb-1">路徑</div>
-          <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+          <div className="text-text-muted text-xs mb-1">路徑</div>
+          <div className="flex items-center gap-2 text-text">
             <span className="px-2 py-1 bg-blue-50 dark:bg-blue-900/30 rounded text-blue-700 dark:text-blue-400 font-medium">{sourceName}</span>
-            <span className="text-gray-400">→</span>
+            <span className="text-text-muted">→</span>
             <span className="px-2 py-1 bg-blue-50 dark:bg-blue-900/30 rounded text-blue-700 dark:text-blue-400 font-medium">{targetName}</span>
           </div>
         </div>
 
         {/* Condition label */}
         <div>
-          <label className="text-xs font-medium text-gray-500 dark:text-gray-400 block mb-1">條件標籤</label>
+          <label className="text-xs font-medium text-text-secondary block mb-1">條件標籤</label>
           {editMode ? (
             <div className="space-y-2">
               <input
@@ -62,7 +62,7 @@ export default function EdgeEditor() {
                 value={label}
                 onChange={(e) => setLabel(e.target.value)}
                 placeholder="例：金額>10萬、是、否、通過、退回..."
-                className="w-full text-sm px-3 py-2 border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-400"
+                className="w-full text-sm px-3 py-2 border border-border bg-surface rounded-lg focus:outline-none focus:ring-1 focus:ring-primary text-text"
               />
               <button
                 onClick={() => updateEdgeLabel(selectedEdgeId, label)}
@@ -72,8 +72,8 @@ export default function EdgeEditor() {
               </button>
             </div>
           ) : (
-            <div className="text-sm text-gray-700 dark:text-gray-300">
-              {typeof edge.label === "string" && edge.label ? edge.label : <span className="text-gray-400">（無條件）</span>}
+            <div className="text-sm text-text">
+              {typeof edge.label === "string" && edge.label ? edge.label : <span className="text-text-muted">（無條件）</span>}
             </div>
           )}
         </div>
@@ -81,13 +81,13 @@ export default function EdgeEditor() {
         {/* Quick presets */}
         {editMode && (
           <div>
-            <label className="text-xs font-medium text-gray-500 dark:text-gray-400 block mb-1.5">常用條件</label>
+            <label className="text-xs font-medium text-text-secondary block mb-1.5">常用條件</label>
             <div className="flex flex-wrap gap-1.5">
               {["是", "否", "通過", "退回", "金額≤10萬", "金額>10萬", "金額>100萬", "核准", "駁回"].map((preset) => (
                 <button
                   key={preset}
                   onClick={() => { setLabel(preset); updateEdgeLabel(selectedEdgeId, preset); }}
-                  className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
+                  className="px-2 py-1 text-xs bg-surface-hover text-text-secondary rounded hover:bg-surface-hover"
                 >
                   {preset}
                 </button>

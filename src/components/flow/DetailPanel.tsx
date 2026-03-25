@@ -54,10 +54,10 @@ const SIGN_METHODS: { value: SignMethod; label: string }[] = [
 function Section({ title, defaultOpen = true, children }: { title: string; defaultOpen?: boolean; children: React.ReactNode }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="border-b border-gray-100 last:border-b-0">
+    <div className="border-b border-border-light last:border-b-0">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 w-full py-2.5 text-sm font-semibold text-gray-700 hover:text-gray-900"
+        className="flex items-center gap-2 w-full py-2.5 text-sm font-semibold text-text hover:text-text"
       >
         {open ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
         {title}
@@ -68,11 +68,11 @@ function Section({ title, defaultOpen = true, children }: { title: string; defau
 }
 
 function ApprovalTable({ authorities }: { authorities: ApprovalAuthority[] }) {
-  if (!authorities.length) return <p className="text-gray-400 text-sm">無核決權限</p>;
+  if (!authorities.length) return <p className="text-text-muted text-sm">無核決權限</p>;
   return (
     <table className="w-full text-sm">
       <thead>
-        <tr className="text-gray-400 border-b">
+        <tr className="text-text-muted border-b">
           <th className="text-left py-1.5 font-medium">金額</th>
           <th className="text-left py-1.5 font-medium">職級</th>
           <th className="text-left py-1.5 font-medium">人員</th>
@@ -81,17 +81,17 @@ function ApprovalTable({ authorities }: { authorities: ApprovalAuthority[] }) {
       </thead>
       <tbody>
         {authorities.map((a) => (
-          <tr key={a.id} className="border-b border-gray-50">
-            <td className="py-2 text-gray-600">
+          <tr key={a.id} className="border-b border-border-light">
+            <td className="py-2 text-text-secondary">
               {a.isNA ? "N/A" : a.amountMin && a.amountMax ? `${formatAmount(a.amountMin)}~${formatAmount(a.amountMax)}` : a.amountMax ? `<= ${formatAmount(a.amountMax)}` : a.amountMin ? `> ${formatAmount(a.amountMin)}` : "-"}
             </td>
-            <td className="py-2 text-gray-700 font-medium">{a.level}</td>
-            <td className="py-2 text-gray-600">{a.levelPerson}</td>
+            <td className="py-2 text-text font-medium">{a.level}</td>
+            <td className="py-2 text-text-secondary">{a.levelPerson}</td>
             <td className="py-2 text-center">
               <span className={cn("inline-block px-2 py-0.5 rounded text-xs font-bold",
-                a.action === "approve" && "bg-red-100 text-red-700",
-                a.action === "review" && "bg-yellow-100 text-yellow-700",
-                a.action === "initiate" && "bg-blue-100 text-blue-700"
+                a.action === "approve" && "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400",
+                a.action === "review" && "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400",
+                a.action === "initiate" && "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400"
               )}>{approvalActionLabel(a.action)}</span>
             </td>
           </tr>
@@ -108,8 +108,8 @@ function EditableStringList({ items, onChange, placeholder }: { items: string[];
     <div className="space-y-1">
       {items.map((item, i) => (
         <div key={i} className="flex items-center gap-1 group">
-          <span className="flex-1 text-sm text-gray-700 bg-gray-50 px-2 py-1 rounded">{item}</span>
-          <button onClick={() => onChange(items.filter((_, idx) => idx !== i))} className="opacity-0 group-hover:opacity-100 p-0.5 text-gray-400 hover:text-red-500">
+          <span className="flex-1 text-sm text-text bg-surface-hover px-2 py-1 rounded">{item}</span>
+          <button onClick={() => onChange(items.filter((_, idx) => idx !== i))} className="opacity-0 group-hover:opacity-100 p-0.5 text-text-muted hover:text-red-500 dark:hover:text-red-400">
             <X className="w-3 h-3" />
           </button>
         </div>
@@ -117,8 +117,8 @@ function EditableStringList({ items, onChange, placeholder }: { items: string[];
       <div className="flex gap-1">
         <input type="text" value={newItem} onChange={(e) => setNewItem(e.target.value)}
           onKeyDown={(e) => { if (e.key === "Enter" && newItem.trim()) { onChange([...items, newItem.trim()]); setNewItem(""); } }}
-          placeholder={placeholder} className="flex-1 text-sm px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-400" />
-        <button onClick={() => { if (newItem.trim()) { onChange([...items, newItem.trim()]); setNewItem(""); } }} className="p-1 text-blue-500 hover:text-blue-600">
+          placeholder={placeholder} className="flex-1 text-sm px-2 py-1 border border-border rounded focus:outline-none focus:ring-1 focus:ring-primary" />
+        <button onClick={() => { if (newItem.trim()) { onChange([...items, newItem.trim()]); setNewItem(""); } }} className="p-1 text-primary hover:text-primary">
           <Plus className="w-4 h-4" />
         </button>
       </div>
@@ -163,9 +163,9 @@ function DiffPreview({ original, draft, onConfirm, onCancel }: {
   if (changes.length === 0) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-        <div className="bg-white rounded-xl shadow-xl p-6 max-w-md">
-          <p className="text-gray-600 text-sm mb-4">沒有修改內容</p>
-          <button onClick={onCancel} className="px-4 py-2 bg-gray-100 text-gray-700 text-sm rounded-lg hover:bg-gray-200">關閉</button>
+        <div className="bg-surface rounded-xl shadow-xl p-6 max-w-md">
+          <p className="text-text-secondary text-sm mb-4">沒有修改內容</p>
+          <button onClick={onCancel} className="px-4 py-2 bg-surface-hover text-text text-sm rounded-lg hover:bg-surface-hover">關閉</button>
         </div>
       </div>
     );
@@ -173,30 +173,30 @@ function DiffPreview({ original, draft, onConfirm, onCancel }: {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-      <div className="bg-white rounded-xl shadow-xl w-[480px] max-h-[80vh] overflow-y-auto">
+      <div className="bg-surface rounded-xl shadow-xl w-[480px] max-h-[80vh] overflow-y-auto">
         <div className="p-4 border-b">
-          <h3 className="font-bold text-lg text-gray-800">確認修改</h3>
-          <p className="text-sm text-gray-500 mt-1">以下欄位將被更新：</p>
+          <h3 className="font-bold text-lg text-text">確認修改</h3>
+          <p className="text-sm text-text-secondary mt-1">以下欄位將被更新：</p>
         </div>
         <div className="p-4 space-y-3">
           {changes.map((c) => (
             <div key={c.field} className="text-sm">
-              <div className="font-medium text-gray-700 mb-1">{c.label}</div>
+              <div className="font-medium text-text mb-1">{c.label}</div>
               <div className="grid grid-cols-2 gap-2">
-                <div className="px-2 py-1.5 bg-red-50 rounded border border-red-100">
-                  <span className="text-[10px] text-red-400 block mb-0.5">修改前</span>
-                  <span className="text-red-700 text-xs break-all">{c.from}</span>
+                <div className="px-2 py-1.5 bg-red-50 dark:bg-red-900/20 rounded border border-red-100 dark:border-red-800">
+                  <span className="text-[10px] text-red-400 dark:text-red-500 block mb-0.5">修改前</span>
+                  <span className="text-red-700 dark:text-red-300 text-xs break-all">{c.from}</span>
                 </div>
-                <div className="px-2 py-1.5 bg-green-50 rounded border border-green-100">
-                  <span className="text-[10px] text-green-400 block mb-0.5">修改後</span>
-                  <span className="text-green-700 text-xs break-all">{c.to}</span>
+                <div className="px-2 py-1.5 bg-green-50 dark:bg-green-900/20 rounded border border-green-100 dark:border-green-800">
+                  <span className="text-[10px] text-green-400 dark:text-green-500 block mb-0.5">修改後</span>
+                  <span className="text-green-700 dark:text-green-300 text-xs break-all">{c.to}</span>
                 </div>
               </div>
             </div>
           ))}
         </div>
         <div className="flex justify-end gap-2 p-4 border-t">
-          <button onClick={onCancel} className="px-4 py-2 bg-gray-100 text-gray-700 text-sm rounded-lg hover:bg-gray-200">取消</button>
+          <button onClick={onCancel} className="px-4 py-2 bg-surface-hover text-text text-sm rounded-lg hover:bg-surface-hover">取消</button>
           <button onClick={onConfirm} className="px-4 py-2 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600">確認儲存</button>
         </div>
       </div>
@@ -230,19 +230,19 @@ function PreferencesToggle({ sectionOrder, onReorder }: { sectionOrder: SectionK
 
   return (
     <div className="mb-3">
-      <button onClick={() => setOpen(!open)} className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-600">
+      <button onClick={() => setOpen(!open)} className="flex items-center gap-1.5 text-sm text-text-muted hover:text-text-secondary">
         <Settings2 className="w-4 h-4" /> 顯示項目設定
       </button>
       {open && (
-        <div className="mt-2 p-3 bg-gray-50 rounded-lg space-y-1">
+        <div className="mt-2 p-3 bg-surface-hover rounded-lg space-y-1">
           {orderedItems.map((item, index) => (
             <div key={item.key} className="flex items-center gap-2 py-1">
               <div className="flex gap-0.5">
-                <button onClick={() => moveUp(index)} className="p-0.5 text-gray-300 hover:text-gray-600" disabled={index === 0}><ArrowUp className="w-3 h-3" /></button>
-                <button onClick={() => moveDown(index)} className="p-0.5 text-gray-300 hover:text-gray-600" disabled={index === orderedItems.length - 1}><ArrowDown className="w-3 h-3" /></button>
+                <button onClick={() => moveUp(index)} className="p-0.5 text-text-muted hover:text-text-secondary" disabled={index === 0}><ArrowUp className="w-3 h-3" /></button>
+                <button onClick={() => moveDown(index)} className="p-0.5 text-text-muted hover:text-text-secondary" disabled={index === orderedItems.length - 1}><ArrowDown className="w-3 h-3" /></button>
               </div>
-              <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer flex-1">
-                <input type="checkbox" checked={prefs[item.key]} onChange={(e) => setPrefs({ [item.key]: e.target.checked })} className="rounded border-gray-300 w-3.5 h-3.5" />
+              <label className="flex items-center gap-2 text-sm text-text-secondary cursor-pointer flex-1">
+                <input type="checkbox" checked={prefs[item.key]} onChange={(e) => setPrefs({ [item.key]: e.target.checked })} className="rounded border-border w-3.5 h-3.5" />
                 {item.label}
               </label>
             </div>
@@ -291,7 +291,7 @@ export default function DetailPanel() {
     setEditDraft({ ...(editDraft || {}), ...partial });
   };
 
-  const inputClass = "w-full text-sm px-2 py-1.5 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-400";
+  const inputClass = "w-full text-sm px-2 py-1.5 border border-border rounded focus:outline-none focus:ring-1 focus:ring-primary";
   const selectClass = inputClass;
 
   // Highlight changed fields
@@ -315,7 +315,7 @@ export default function DetailPanel() {
                 </select>
               </div>
             ) : (
-              <span className="inline-flex items-center px-2.5 py-1 rounded bg-blue-50 text-blue-700 text-sm font-medium">{d.operatingSystem}</span>
+              <span className="inline-flex items-center px-2.5 py-1 rounded bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-sm font-medium">{d.operatingSystem}</span>
             )}
           </Section>
         );
@@ -333,7 +333,7 @@ export default function DetailPanel() {
                 </select>
               </div>
             ) : (
-              <span className="text-sm text-gray-700">{signMethodLabels[d.signMethod!] || d.signMethod}</span>
+              <span className="text-sm text-text">{signMethodLabels[d.signMethod!] || d.signMethod}</span>
             )}
           </Section>
         );
@@ -345,20 +345,20 @@ export default function DetailPanel() {
             {editMode ? (
               <div className={cn("flex flex-wrap gap-3", isChanged("status") && "ring-2 ring-orange-300 rounded p-1")}>
                 {(["vacant", "unsigned", "paperSign"] as const).map((k) => (
-                  <label key={k} className="flex items-center gap-1.5 text-sm text-gray-700 cursor-pointer">
-                    <input type="checkbox" checked={(v.status as unknown as Record<string, boolean>)[k]} onChange={(e) => updateDraft({ status: { ...v.status, [k]: e.target.checked } })} className="rounded border-gray-300 w-3.5 h-3.5" />
+                  <label key={k} className="flex items-center gap-1.5 text-sm text-text cursor-pointer">
+                    <input type="checkbox" checked={(v.status as unknown as Record<string, boolean>)[k]} onChange={(e) => updateDraft({ status: { ...v.status, [k]: e.target.checked } })} className="rounded border-border w-3.5 h-3.5" />
                     {k === "vacant" ? "缺人" : k === "unsigned" ? "未簽" : "紙本簽"}
                   </label>
                 ))}
-                <input type="text" value={v.status.other} onChange={(e) => updateDraft({ status: { ...v.status, other: e.target.value } })} placeholder="其他" className="text-sm px-2 py-1 border border-gray-200 rounded w-20 focus:outline-none focus:ring-1 focus:ring-blue-400" />
+                <input type="text" value={v.status.other} onChange={(e) => updateDraft({ status: { ...v.status, other: e.target.value } })} placeholder="其他" className="text-sm px-2 py-1 border border-border rounded w-20 focus:outline-none focus:ring-1 focus:ring-primary" />
               </div>
             ) : (
               <div className="flex flex-wrap gap-1.5">
-                {d.status.vacant && <span className="px-2.5 py-1 rounded bg-red-50 text-red-600 text-sm">缺人</span>}
-                {d.status.unsigned && <span className="px-2.5 py-1 rounded bg-yellow-50 text-yellow-600 text-sm">未簽</span>}
-                {d.status.paperSign && <span className="px-2.5 py-1 rounded bg-gray-100 text-gray-600 text-sm">紙本簽</span>}
-                {d.status.other && <span className="px-2.5 py-1 rounded bg-gray-100 text-gray-600 text-sm">{d.status.other}</span>}
-                {!d.status.vacant && !d.status.unsigned && !d.status.paperSign && !d.status.other && <span className="text-sm text-gray-400">正常</span>}
+                {d.status.vacant && <span className="px-2.5 py-1 rounded bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm">缺人</span>}
+                {d.status.unsigned && <span className="px-2.5 py-1 rounded bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400 text-sm">未簽</span>}
+                {d.status.paperSign && <span className="px-2.5 py-1 rounded bg-surface-hover text-text-secondary text-sm">紙本簽</span>}
+                {d.status.other && <span className="px-2.5 py-1 rounded bg-surface-hover text-text-secondary text-sm">{d.status.other}</span>}
+                {!d.status.vacant && !d.status.unsigned && !d.status.paperSign && !d.status.other && <span className="text-sm text-text-muted">正常</span>}
               </div>
             )}
           </Section>
@@ -383,7 +383,7 @@ export default function DetailPanel() {
               </div>
             ) : (
               <ul className="space-y-1.5">
-                {d.keyPoints.map((p, i) => <li key={i} className="text-sm text-gray-600 flex gap-2"><span className="text-blue-400 mt-0.5">-</span> {p}</li>)}
+                {d.keyPoints.map((p, i) => <li key={i} className="text-sm text-text-secondary flex gap-2"><span className="text-blue-400 dark:text-blue-500 mt-0.5">-</span> {p}</li>)}
               </ul>
             )}
           </Section>
@@ -400,7 +400,7 @@ export default function DetailPanel() {
               </div>
             ) : (
               <ul className="space-y-1.5">
-                {d.risks.map((r, i) => <li key={i} className="text-sm text-red-600 flex gap-2"><span className="mt-0.5">!</span> {r}</li>)}
+                {d.risks.map((r, i) => <li key={i} className="text-sm text-red-600 dark:text-red-400 flex gap-2"><span className="mt-0.5">!</span> {r}</li>)}
               </ul>
             )}
           </Section>
@@ -413,8 +413,8 @@ export default function DetailPanel() {
             <div className="space-y-2.5">
               {v.personnel.map((p) => (
                 <div key={p.id} className="text-sm">
-                  <div className="font-medium text-gray-700">{p.role}（{p.department}）</div>
-                  <div className="text-gray-500 mt-0.5">現任：{p.currentHolder}{p.deputy && ` / 代理：${p.deputy}`}</div>
+                  <div className="font-medium text-text">{p.role}（{p.department}）</div>
+                  <div className="text-text-secondary mt-0.5">現任：{p.currentHolder}{p.deputy && ` / 代理：${p.deputy}`}</div>
                 </div>
               ))}
             </div>
@@ -428,8 +428,8 @@ export default function DetailPanel() {
             <div className="space-y-2.5">
               {v.reports.map((r) => (
                 <div key={r.id} className="text-sm">
-                  <div className="font-medium text-gray-700">{r.reportName}</div>
-                  <div className="text-gray-500 mt-0.5">{r.frequency === "monthly" ? "月報" : r.frequency} / {r.deadline || "-"} / {r.recipient || "-"}</div>
+                  <div className="font-medium text-text">{r.reportName}</div>
+                  <div className="text-text-secondary mt-0.5">{r.frequency === "monthly" ? "月報" : r.frequency} / {r.deadline || "-"} / {r.recipient || "-"}</div>
                 </div>
               ))}
             </div>
@@ -447,7 +447,7 @@ export default function DetailPanel() {
               </div>
             ) : (
               <div className="flex flex-wrap gap-1.5">
-                {d.relatedForms.map((f, i) => <span key={i} className="px-2.5 py-1 rounded bg-gray-50 text-gray-600 text-sm">{f}</span>)}
+                {d.relatedForms.map((f, i) => <span key={i} className="px-2.5 py-1 rounded bg-surface-hover text-text-secondary text-sm">{f}</span>)}
               </div>
             )}
           </Section>
@@ -460,41 +460,41 @@ export default function DetailPanel() {
 
   return (
     <>
-      <div className="w-96 border-l border-gray-200 bg-white overflow-y-auto flex-shrink-0">
+      <div className="w-96 border-l border-border bg-surface overflow-y-auto flex-shrink-0">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-100">
+        <div className="flex items-center justify-between p-4 border-b border-border-light">
           <div className="flex-1 min-w-0">
             {editMode ? (
               <input
                 type="text"
                 value={v.label}
                 onChange={(e) => updateDraft({ label: e.target.value })}
-                className={cn("font-bold text-lg text-gray-800 w-full px-2 py-1 border rounded focus:outline-none focus:ring-1 focus:ring-blue-400", isChanged("label") && "ring-2 ring-orange-300")}
+                className={cn("font-bold text-lg text-text w-full px-2 py-1 border rounded focus:outline-none focus:ring-1 focus:ring-primary", isChanged("label") && "ring-2 ring-orange-300")}
               />
             ) : (
-              <h3 className="font-bold text-lg text-gray-800 truncate">{d.label}</h3>
+              <h3 className="font-bold text-lg text-text truncate">{d.label}</h3>
             )}
           </div>
           <div className="flex items-center gap-1 ml-2">
             {canEdit() && (
               <button
                 onClick={() => setEditMode(!editMode)}
-                className={cn("p-1.5 rounded", editMode ? "bg-blue-50 text-blue-600" : "hover:bg-gray-100 text-gray-400")}
+                className={cn("p-1.5 rounded", editMode ? "bg-blue-50 dark:bg-blue-900/30 text-primary" : "hover:bg-surface-hover text-text-muted")}
                 title={editMode ? "檢視模式" : "編輯模式"}
               >
                 {editMode ? <Eye className="w-4 h-4" /> : <Pencil className="w-4 h-4" />}
               </button>
             )}
-            <button onClick={() => { setDetailPanelOpen(false); setSelectedNodeId(null); }} className="p-1 rounded hover:bg-gray-100">
-              <X className="w-5 h-5 text-gray-400" />
+            <button onClick={() => { setDetailPanelOpen(false); setSelectedNodeId(null); }} className="p-1 rounded hover:bg-surface-hover">
+              <X className="w-5 h-5 text-text-muted" />
             </button>
           </div>
         </div>
 
         {/* Edit mode toolbar */}
         {editMode && (
-          <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 border-b border-blue-100">
-            <span className="text-xs text-blue-600 font-medium flex-1">編輯模式</span>
+          <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-900/20 border-b border-blue-100 dark:border-blue-800">
+            <span className="text-xs text-primary font-medium flex-1">編輯模式</span>
             {editMode && (
               <div className="flex items-center gap-1">
                 {editDraft && (
@@ -502,14 +502,14 @@ export default function DetailPanel() {
                     <button onClick={() => setShowDiff(true)} className="flex items-center gap-1 px-2.5 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600">
                       <Save className="w-3 h-3" /> 儲存
                     </button>
-                    <button onClick={discardEditDraft} className="flex items-center gap-1 px-2.5 py-1 bg-gray-100 text-gray-600 text-xs rounded hover:bg-gray-200">
+                    <button onClick={discardEditDraft} className="flex items-center gap-1 px-2.5 py-1 bg-surface-hover text-text-secondary text-xs rounded hover:bg-surface-hover">
                       <Undo2 className="w-3 h-3" /> 放棄
                     </button>
                   </>
                 )}
                 <button
                   onClick={() => { if (confirm("確定刪除此節點？")) { deleteNode(selectedNodeId); } }}
-                  className="p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded"
+                  className="p-1 text-red-400 dark:text-red-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
                   title="刪除節點"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
@@ -523,7 +523,7 @@ export default function DetailPanel() {
         {editMode && (
           <div className="px-4 pt-3 pb-1">
             <div className={cn("", isChanged("nodeType") && "ring-2 ring-orange-300 rounded")}>
-              <label className="text-xs font-medium text-gray-500 mb-1 block">節點類型</label>
+              <label className="text-xs font-medium text-text-secondary mb-1 block">節點類型</label>
               <select value={v.nodeType} onChange={(e) => updateDraft({ nodeType: e.target.value as NodeType })} className={selectClass}>
                 {NODE_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
               </select>
@@ -545,7 +545,7 @@ export default function DetailPanel() {
                 </div>
               ) : (
                 <ul className="space-y-1.5">
-                  {d.controlPoints.map((c, i) => <li key={i} className="text-sm text-gray-600 flex gap-2"><span className="text-purple-400 mt-0.5">-</span> {c}</li>)}
+                  {d.controlPoints.map((c, i) => <li key={i} className="text-sm text-text-secondary flex gap-2"><span className="text-purple-400 dark:text-purple-500 mt-0.5">-</span> {c}</li>)}
                 </ul>
               )}
             </Section>

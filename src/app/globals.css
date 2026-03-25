@@ -1,18 +1,56 @@
 @import "tailwindcss";
 
+/* ── FSC Design System ── */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #F8FAFC;
+  --foreground: #0F172A;
+  --surface: #FFFFFF;
+  --surface-hover: #F1F5F9;
+  --border: #E2E8F0;
+  --border-light: #F1F5F9;
+  --text: #0F172A;
+  --text-secondary: #64748B;
+  --text-muted: #94A3B8;
+  --primary: #3B82F6;
+  --primary-bg: #EFF6FF;
+  --primary-hover: #2563EB;
+  --sidebar: #FFFFFF;
+  --sidebar-border: #E2E8F0;
 }
 
 .dark {
-  --background: #0a0a0a;
-  --foreground: #ededed;
+  --background: #0B1120;
+  --foreground: #F1F5F9;
+  --surface: #131B2E;
+  --surface-hover: #1C2640;
+  --border: #1E293B;
+  --border-light: #1E293B;
+  --text: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --primary: #60A5FA;
+  --primary-bg: #1E3A5F;
+  --primary-hover: #3B82F6;
+  --sidebar: #0F172A;
+  --sidebar-border: #1E293B;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+  --color-border: var(--border);
+  --color-border-light: var(--border-light);
+  --color-text: var(--text);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-primary: var(--primary);
+  --color-primary-bg: var(--primary-bg);
+  --color-primary-hover: var(--primary-hover);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-border: var(--sidebar-border);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -23,46 +61,45 @@ body {
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
 
-/* Dark mode React Flow overrides */
-.dark .react-flow__controls button {
-  background: #1f2937;
-  border-color: #374151;
-  fill: #9ca3af;
-}
-.dark .react-flow__controls button:hover {
-  background: #374151;
-}
-.dark .react-flow__edge-path {
-  stroke: #6b7280;
-}
-.dark .react-flow__arrowhead polyline {
-  stroke: #6b7280;
-  fill: #6b7280;
-}
-
-/* React Flow overrides */
+/* ── React Flow overrides ── */
 .react-flow__node {
   cursor: pointer;
 }
 
+.react-flow__controls button {
+  background: var(--surface) !important;
+  border-color: var(--border) !important;
+  fill: var(--text-secondary) !important;
+}
+.react-flow__controls button:hover {
+  background: var(--surface-hover) !important;
+}
+
+.react-flow__edge-path {
+  stroke: var(--text-muted);
+}
+.react-flow__arrowhead polyline {
+  stroke: var(--text-muted);
+  fill: var(--text-muted);
+}
+
 .react-flow__edge-text {
   font-size: 12px;
-  fill: #374151;
+  fill: var(--text-secondary);
 }
 .react-flow__edge-textbg {
-  fill: #f9fafb;
+  fill: var(--surface);
   rx: 4;
-}
-.dark .react-flow__edge-text {
-  fill: #d1d5db;
-}
-.dark .react-flow__edge-textbg {
-  fill: #1f2937;
 }
 
 .react-flow__edge.selected .react-flow__edge-path {
-  stroke: #3b82f6;
+  stroke: var(--primary);
 }
 .react-flow__edge.selected .react-flow__edge-text {
-  fill: #3b82f6;
+  fill: var(--primary);
+}
+
+/* ── React Flow background dots ── */
+.dark .react-flow__background pattern circle {
+  fill: #1E293B;
 }

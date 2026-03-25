@@ -12,10 +12,10 @@ function Toggle({ label, desc, checked, onChange }: { label: string; desc: strin
   return (
     <label className="flex items-center justify-between">
       <div>
-        <div className="text-sm font-medium text-gray-700">{label}</div>
-        <div className="text-xs text-gray-400">{desc}</div>
+        <div className="text-sm font-medium text-text">{label}</div>
+        <div className="text-xs text-text-muted">{desc}</div>
       </div>
-      <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="w-4 h-4 rounded border-gray-300" />
+      <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="w-4 h-4 rounded border-border" />
     </label>
   );
 }
@@ -23,17 +23,17 @@ function Toggle({ label, desc, checked, onChange }: { label: string; desc: strin
 function LogEntry({ log }: { log: OperationLog }) {
   const t = new Date(log.timestamp);
   return (
-    <div className="flex items-start gap-3 py-2 border-b border-gray-50 last:border-b-0">
-      <div className="text-[10px] text-gray-400 mt-0.5 w-16 flex-shrink-0">
+    <div className="flex items-start gap-3 py-2 border-b border-border-light last:border-b-0">
+      <div className="text-[10px] text-text-muted mt-0.5 w-16 flex-shrink-0">
         {t.toLocaleTimeString("zh-TW", { hour: "2-digit", minute: "2-digit" })}
       </div>
       <div className="flex-1 min-w-0">
-        <div className="text-sm text-gray-700">{log.detail}</div>
+        <div className="text-sm text-text">{log.detail}</div>
         {log.changes && log.changes.length > 0 && (
           <div className="mt-1 space-y-0.5">
             {log.changes.map((c, i) => (
-              <div key={i} className="text-xs text-gray-400">
-                <span className="text-gray-500">{c.field}</span>：
+              <div key={i} className="text-xs text-text-muted">
+                <span className="text-text-secondary">{c.field}</span>：
                 <span className="text-red-400 line-through">{c.from.slice(0, 30)}</span>
                 {" → "}
                 <span className="text-green-600">{c.to.slice(0, 30)}</span>
@@ -42,7 +42,7 @@ function LogEntry({ log }: { log: OperationLog }) {
           </div>
         )}
       </div>
-      <span className="text-[10px] px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 flex-shrink-0">
+      <span className="text-[10px] px-1.5 py-0.5 rounded bg-surface-hover text-text-secondary flex-shrink-0">
         {log.action.split(".")[1]}
       </span>
     </div>
@@ -52,20 +52,20 @@ function LogEntry({ log }: { log: OperationLog }) {
 function SnapshotRow({ snap, onRestore, onDelete }: { snap: FlowSnapshot; onRestore: () => void; onDelete: () => void }) {
   const t = new Date(snap.timestamp);
   return (
-    <div className="flex items-center gap-3 py-2 border-b border-gray-50 last:border-b-0 group">
-      <Clock className="w-3.5 h-3.5 text-gray-300 flex-shrink-0" />
+    <div className="flex items-center gap-3 py-2 border-b border-border-light last:border-b-0 group">
+      <Clock className="w-3.5 h-3.5 text-text-muted flex-shrink-0" />
       <div className="flex-1 min-w-0">
-        <div className="text-sm text-gray-700 truncate">{snap.label}</div>
-        <div className="text-xs text-gray-400">
+        <div className="text-sm text-text truncate">{snap.label}</div>
+        <div className="text-xs text-text-muted">
           {t.toLocaleDateString("zh-TW")} {t.toLocaleTimeString("zh-TW", { hour: "2-digit", minute: "2-digit" })}
           {" · "}{snap.nodes.length} 節點
         </div>
       </div>
       <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-        <button onClick={onRestore} className="p-1 text-blue-500 hover:bg-blue-50 rounded" title="還原此版本">
+        <button onClick={onRestore} className="p-1 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded" title="還原此版本">
           <RotateCcw className="w-3.5 h-3.5" />
         </button>
-        <button onClick={onDelete} className="p-1 text-red-400 hover:bg-red-50 rounded" title="刪除">
+        <button onClick={onDelete} className="p-1 text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded" title="刪除">
           <Trash2 className="w-3.5 h-3.5" />
         </button>
       </div>
@@ -84,18 +84,18 @@ function EditableList({ title, items, onAdd, onRemove, onUpdate, showCode }: {
 }) {
   const [newItem, setNewItem] = useState("");
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-4">
-      <h3 className="font-semibold text-gray-800 text-sm mb-3">{title}</h3>
+    <div className="bg-surface border border-border rounded-lg p-4">
+      <h3 className="font-semibold text-text text-sm mb-3">{title}</h3>
       <div className="space-y-1 mb-3">
         {items.map((item) => (
-          <div key={item.id} className="flex items-center gap-2 px-1 py-0.5 bg-gray-50 rounded group">
+          <div key={item.id} className="flex items-center gap-2 px-1 py-0.5 bg-surface-hover rounded group">
             {showCode && (
               <input type="number" value={item.code ?? ""} onChange={(e) => onUpdate(item.id, "code", Number(e.target.value))}
-                className="w-12 text-xs text-center px-1 py-1 rounded border border-transparent hover:border-gray-200 focus:border-blue-400 focus:outline-none bg-transparent text-blue-600 font-mono font-bold" />
+                className="w-12 text-xs text-center px-1 py-1 rounded border border-transparent hover:border-border focus:border-primary focus:outline-none bg-transparent text-primary font-mono font-bold" />
             )}
             <input type="text" value={item.name} onChange={(e) => onUpdate(item.id, "name", e.target.value)}
-              className="flex-1 text-sm px-2 py-1 rounded border border-transparent hover:border-gray-200 focus:border-blue-400 focus:outline-none bg-transparent text-gray-700" />
-            <button onClick={() => onRemove(item.id)} className="opacity-0 group-hover:opacity-100 p-0.5 text-gray-400 hover:text-red-500">
+              className="flex-1 text-sm px-2 py-1 rounded border border-transparent hover:border-border focus:border-primary focus:outline-none bg-transparent text-text" />
+            <button onClick={() => onRemove(item.id)} className="opacity-0 group-hover:opacity-100 p-0.5 text-text-muted hover:text-red-500 dark:hover:text-red-400">
               <X className="w-3 h-3" />
             </button>
           </div>
@@ -104,7 +104,7 @@ function EditableList({ title, items, onAdd, onRemove, onUpdate, showCode }: {
       <div className="flex gap-2">
         <input type="text" value={newItem} onChange={(e) => setNewItem(e.target.value)}
           onKeyDown={(e) => { if (e.key === "Enter" && newItem.trim()) { onAdd(newItem.trim()); setNewItem(""); } }}
-          placeholder="新增..." className="flex-1 text-sm px-3 py-1.5 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-400" />
+          placeholder="新增..." className="flex-1 text-sm px-3 py-1.5 border border-border rounded focus:outline-none focus:ring-1 focus:ring-primary" />
         <button onClick={() => { if (newItem.trim()) { onAdd(newItem.trim()); setNewItem(""); } }}
           className="px-3 py-1.5 bg-blue-500 text-white text-sm rounded hover:bg-blue-600">
           <Plus className="w-4 h-4" />
@@ -126,27 +126,27 @@ function DeptTreeItem({ node, depth, onAdd, onRemove, onRename }: {
   const [adding, setAdding] = useState(false);
   const [newName, setNewName] = useState("");
   const hasChildren = node.children.length > 0;
-  const levelColors = ["bg-red-100 text-red-600", "bg-orange-100 text-orange-600", "bg-blue-100 text-blue-600", "bg-green-100 text-green-600", "bg-gray-100 text-gray-600"];
+  const levelColors = ["bg-red-100 text-red-600", "bg-orange-100 text-orange-600", "bg-blue-100 text-blue-600", "bg-green-100 text-green-600", "bg-gray-100 text-text-secondary"];
 
   return (
     <div>
-      <div className="flex items-center gap-1 group py-1 hover:bg-gray-50 rounded" style={{ paddingLeft: `${depth * 20 + 8}px` }}>
-        <button onClick={() => setOpen(!open)} className="w-5 h-5 flex items-center justify-center text-gray-400">
-          {hasChildren ? (open ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />) : <span className="w-3.5 h-3.5 flex items-center justify-center text-gray-300">·</span>}
+      <div className="flex items-center gap-1 group py-1 hover:bg-surface-hover rounded" style={{ paddingLeft: `${depth * 20 + 8}px` }}>
+        <button onClick={() => setOpen(!open)} className="w-5 h-5 flex items-center justify-center text-text-muted">
+          {hasChildren ? (open ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />) : <span className="w-3.5 h-3.5 flex items-center justify-center text-text-muted">·</span>}
         </button>
         <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${levelColors[Math.min(depth, levelColors.length - 1)]}`}>L{depth + 1}</span>
         <input type="text" value={node.name} onChange={(e) => onRename(node.id, e.target.value)}
-          className="flex-1 text-sm px-2 py-0.5 rounded border border-transparent hover:border-gray-200 focus:border-blue-400 focus:outline-none bg-transparent text-gray-700" />
-        <button onClick={() => setAdding(true)} className="opacity-0 group-hover:opacity-100 p-0.5 text-gray-400 hover:text-blue-500" title="新增子部門"><Plus className="w-3 h-3" /></button>
-        <button onClick={() => onRemove(node.id)} className="opacity-0 group-hover:opacity-100 p-0.5 text-gray-400 hover:text-red-500 mr-2" title="刪除"><X className="w-3 h-3" /></button>
+          className="flex-1 text-sm px-2 py-0.5 rounded border border-transparent hover:border-border focus:border-primary focus:outline-none bg-transparent text-text" />
+        <button onClick={() => setAdding(true)} className="opacity-0 group-hover:opacity-100 p-0.5 text-text-muted hover:text-blue-500" title="新增子部門"><Plus className="w-3 h-3" /></button>
+        <button onClick={() => onRemove(node.id)} className="opacity-0 group-hover:opacity-100 p-0.5 text-text-muted hover:text-red-500 dark:hover:text-red-400 mr-2" title="刪除"><X className="w-3 h-3" /></button>
       </div>
       {adding && (
         <div className="flex gap-1 py-1" style={{ paddingLeft: `${(depth + 1) * 20 + 8}px` }}>
           <input type="text" value={newName} onChange={(e) => setNewName(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter" && newName.trim()) { onAdd(node.id, newName.trim()); setNewName(""); setAdding(false); } if (e.key === "Escape") setAdding(false); }}
-            placeholder="子部門名稱..." autoFocus className="flex-1 text-sm px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-400" />
+            placeholder="子部門名稱..." autoFocus className="flex-1 text-sm px-2 py-1 border border-border rounded focus:outline-none focus:ring-1 focus:ring-primary" />
           <button onClick={() => { if (newName.trim()) { onAdd(node.id, newName.trim()); setNewName(""); setAdding(false); } }} className="px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600">確定</button>
-          <button onClick={() => setAdding(false)} className="px-2 py-1 text-gray-500 text-xs rounded hover:bg-gray-100">取消</button>
+          <button onClick={() => setAdding(false)} className="px-2 py-1 text-text-secondary text-xs rounded hover:bg-surface-hover">取消</button>
         </div>
       )}
       {open && node.children.map((child) => <DeptTreeItem key={child.id} node={child} depth={depth + 1} onAdd={onAdd} onRemove={onRemove} onRename={onRename} />)}
@@ -178,7 +178,7 @@ function PersonnelList() {
   ]);
   const [adding, setAdding] = useState(false);
   const [form, setForm] = useState<Omit<PersonnelItem, "id">>({ name: "", account: "", password: DEFAULT_PASSWORD, department: DEPARTMENTS[0], title: TITLES[0], role: "commenter" });
-  const cellInput = "w-full text-sm px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-400 bg-white";
+  const cellInput = "w-full text-sm px-2 py-1 border border-border rounded focus:outline-none focus:ring-1 focus:ring-primary bg-surface";
   const cellSelect = `${cellInput} appearance-auto`;
 
   const updatePerson = (id: string, field: keyof PersonnelItem, value: string) => {
@@ -193,14 +193,14 @@ function PersonnelList() {
   };
 
   const roleBadge = (role: Role) => {
-    const colors = role === "admin" ? "bg-purple-100 text-purple-700" : role === "editor" ? "bg-blue-100 text-blue-700" : role === "commenter" ? "bg-amber-100 text-amber-700" : "bg-gray-100 text-gray-600";
+    const colors = role === "admin" ? "bg-purple-100 text-purple-700" : role === "editor" ? "bg-blue-100 text-blue-700" : role === "commenter" ? "bg-amber-100 text-amber-700" : "bg-gray-100 text-text-secondary";
     return <span className={`px-2 py-0.5 rounded text-xs font-medium ${colors}`}>{ROLE_LABELS[role]}</span>;
   };
 
   return (
     <div className="max-w-4xl">
       <div className="flex items-center justify-between mb-4">
-        <div className="text-sm text-gray-500">共 {personnel.length} 位人員</div>
+        <div className="text-sm text-text-secondary">共 {personnel.length} 位人員</div>
         <button onClick={() => setAdding(!adding)} className="flex items-center gap-1 px-3 py-1.5 bg-blue-500 text-white text-xs rounded hover:bg-blue-600">
           <Plus className="w-3.5 h-3.5" /> 新增人員
         </button>
@@ -226,10 +226,10 @@ function PersonnelList() {
         </div>
       )}
 
-      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+      <div className="bg-surface border border-border rounded-lg overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b bg-gray-50 text-gray-500">
+            <tr className="border-b bg-surface-hover text-text-secondary">
               <th className="text-left py-2.5 px-3 font-medium">姓名</th>
               <th className="text-left py-2.5 px-3 font-medium">帳號</th>
               <th className="text-left py-2.5 px-3 font-medium w-20">密碼</th>
@@ -241,43 +241,43 @@ function PersonnelList() {
           </thead>
           <tbody>
             {personnel.map((p) => (
-              <tr key={p.id} className="border-b border-gray-50 group">
+              <tr key={p.id} className="border-b border-border-light group">
                 <td className="py-1.5 px-3">
                   <input type="text" value={p.name} onChange={(e) => updatePerson(p.id, "name", e.target.value)}
-                    className="w-full text-sm px-2 py-1 rounded border border-transparent hover:border-gray-200 focus:border-blue-400 focus:outline-none bg-transparent font-medium text-gray-800" />
+                    className="w-full text-sm px-2 py-1 rounded border border-transparent hover:border-border focus:border-primary focus:outline-none bg-transparent font-medium text-text" />
                 </td>
                 <td className="py-1.5 px-3">
                   <input type="text" value={p.account} onChange={(e) => updatePerson(p.id, "account", e.target.value)}
-                    placeholder="-" className="w-full text-sm px-2 py-1 rounded border border-transparent hover:border-gray-200 focus:border-blue-400 focus:outline-none bg-transparent text-gray-500 font-mono text-xs" />
+                    placeholder="-" className="w-full text-sm px-2 py-1 rounded border border-transparent hover:border-border focus:border-primary focus:outline-none bg-transparent text-text-secondary font-mono text-xs" />
                 </td>
                 <td className="py-1.5 px-3">
                   <div className="flex items-center gap-1">
-                    <span className="text-gray-400 text-xs">{"••••"}</span>
+                    <span className="text-text-muted text-xs">{"••••"}</span>
                     <button onClick={() => { if (confirm(`重設「${p.name}」的密碼為預設值？`)) updatePerson(p.id, "password", DEFAULT_PASSWORD); }}
                       className="opacity-0 group-hover:opacity-100 text-[10px] text-blue-500 hover:underline">重設</button>
                   </div>
                 </td>
                 <td className="py-1.5 px-3">
                   <select value={p.department} onChange={(e) => updatePerson(p.id, "department", e.target.value)}
-                    className="w-full text-sm px-1 py-1 rounded border border-transparent hover:border-gray-200 focus:border-blue-400 focus:outline-none bg-transparent text-gray-600 cursor-pointer">
+                    className="w-full text-sm px-1 py-1 rounded border border-transparent hover:border-border focus:border-primary focus:outline-none bg-transparent text-text-secondary cursor-pointer">
                     {DEPARTMENTS.map((d) => <option key={d} value={d}>{d}</option>)}
                   </select>
                 </td>
                 <td className="py-1.5 px-3">
                   <select value={p.title} onChange={(e) => updatePerson(p.id, "title", e.target.value)}
-                    className="w-full text-sm px-1 py-1 rounded border border-transparent hover:border-gray-200 focus:border-blue-400 focus:outline-none bg-transparent text-gray-600 cursor-pointer">
+                    className="w-full text-sm px-1 py-1 rounded border border-transparent hover:border-border focus:border-primary focus:outline-none bg-transparent text-text-secondary cursor-pointer">
                     {TITLES.map((t) => <option key={t} value={t}>{t}</option>)}
                   </select>
                 </td>
                 <td className="py-1.5 px-3">
                   <select value={p.role} onChange={(e) => updatePerson(p.id, "role", e.target.value)}
-                    className="w-full text-sm px-1 py-1 rounded border border-transparent hover:border-gray-200 focus:border-blue-400 focus:outline-none bg-transparent cursor-pointer">
+                    className="w-full text-sm px-1 py-1 rounded border border-transparent hover:border-border focus:border-primary focus:outline-none bg-transparent cursor-pointer">
                     {(Object.keys(ROLE_LABELS) as Role[]).map((r) => <option key={r} value={r}>{ROLE_LABELS[r]}</option>)}
                   </select>
                 </td>
                 <td className="py-1.5 px-2">
                   <button onClick={() => { if (confirm(`確定刪除「${p.name}」？`)) setPersonnel(personnel.filter((x) => x.id !== p.id)); }}
-                    className="opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-red-500">
+                    className="opacity-0 group-hover:opacity-100 p-1 text-text-muted hover:text-red-500 dark:hover:text-red-400">
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </td>
@@ -390,22 +390,22 @@ export default function AdminPage() {
   return (
     <div className="flex h-screen overflow-hidden">
       <Sidebar />
-      <div className="flex-1 overflow-y-auto p-6">
-        <h1 className="text-xl font-bold text-gray-800 mb-6">後台管理</h1>
+      <div className="flex-1 overflow-y-auto p-6 bg-background">
+        <h1 className="text-xl font-bold text-text mb-6">後台管理</h1>
 
         {/* Tabs */}
-        <div className="flex gap-1 mb-6 border-b border-gray-200">
+        <div className="flex gap-1 mb-6 border-b border-border">
           {tabs.map((t) => (
             <button
               key={t.key}
               onClick={() => setTab(t.key)}
               className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
-                tab === t.key ? "border-blue-500 text-blue-600" : "border-transparent text-gray-500 hover:text-gray-700"
+                tab === t.key ? "border-blue-500 text-primary" : "border-transparent text-text-secondary hover:text-text"
               }`}
             >
               {t.label}
               {"count" in t && t.count !== undefined && t.count > 0 && (
-                <span className="ml-1.5 px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-500 text-[10px]">{t.count}</span>
+                <span className="ml-1.5 px-1.5 py-0.5 rounded-full bg-surface-hover text-text-secondary text-[10px]">{t.count}</span>
               )}
             </button>
           ))}
@@ -414,8 +414,8 @@ export default function AdminPage() {
         {/* System Settings */}
         {tab === "settings" && (
           <div className="max-w-2xl space-y-6">
-            <div className="bg-white border border-gray-200 rounded-lg p-4">
-              <h3 className="font-semibold text-gray-800 text-sm mb-4">功能開關</h3>
+            <div className="bg-surface border border-border rounded-lg p-4">
+              <h3 className="font-semibold text-text text-sm mb-4">功能開關</h3>
               <div className="space-y-3">
                 <Toggle label="操作紀錄" desc="記錄所有節點編輯、匯入匯出等操作" checked={loggingEnabled} onChange={setLoggingEnabled} />
                 <Toggle label="JSON 匯入" desc="允許匯入 JSON 檔案建立流程圖" checked={jsonImportEnabled} onChange={setJsonImportEnabled} />
@@ -423,12 +423,12 @@ export default function AdminPage() {
               </div>
             </div>
 
-            <div className="bg-white border border-gray-200 rounded-lg p-4">
-              <h3 className="font-semibold text-gray-800 text-sm mb-4">API 管理</h3>
+            <div className="bg-surface border border-border rounded-lg p-4">
+              <h3 className="font-semibold text-text text-sm mb-4">API 管理</h3>
               <div className="space-y-3">
                 <div>
-                  <label className="text-sm text-gray-600 block mb-1">Provider</label>
-                  <select value={apiProvider} onChange={(e) => setApiProvider(e.target.value)} className="w-full text-sm px-3 py-2 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-400">
+                  <label className="text-sm text-text-secondary block mb-1">Provider</label>
+                  <select value={apiProvider} onChange={(e) => setApiProvider(e.target.value)} className="w-full text-sm px-3 py-2 border border-border rounded focus:outline-none focus:ring-1 focus:ring-primary">
                     <option value="claude">Claude (Anthropic)</option>
                     <option value="openai">OpenAI GPT</option>
                     <option value="ollama">Ollama (本地)</option>
@@ -436,22 +436,22 @@ export default function AdminPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="text-sm text-gray-600 block mb-1">API Key</label>
-                  <input type="password" value={apiKey} onChange={(e) => setApiKey(e.target.value)} placeholder="sk-..." className="w-full text-sm px-3 py-2 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-400" />
+                  <label className="text-sm text-text-secondary block mb-1">API Key</label>
+                  <input type="password" value={apiKey} onChange={(e) => setApiKey(e.target.value)} placeholder="sk-..." className="w-full text-sm px-3 py-2 border border-border rounded focus:outline-none focus:ring-1 focus:ring-primary" />
                 </div>
                 <div>
-                  <label className="text-sm text-gray-600 block mb-1">Endpoint（選填）</label>
-                  <input type="text" value={apiEndpoint} onChange={(e) => setApiEndpoint(e.target.value)} placeholder="https://api.anthropic.com/v1" className="w-full text-sm px-3 py-2 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-400" />
-                  <p className="text-xs text-gray-400 mt-1">自架 Ollama 或 Proxy 時填寫</p>
+                  <label className="text-sm text-text-secondary block mb-1">Endpoint（選填）</label>
+                  <input type="text" value={apiEndpoint} onChange={(e) => setApiEndpoint(e.target.value)} placeholder="https://api.anthropic.com/v1" className="w-full text-sm px-3 py-2 border border-border rounded focus:outline-none focus:ring-1 focus:ring-primary" />
+                  <p className="text-xs text-text-muted mt-1">自架 Ollama 或 Proxy 時填寫</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white border border-gray-200 rounded-lg p-4">
-              <h3 className="font-semibold text-gray-800 text-sm mb-4">角色權限</h3>
+            <div className="bg-surface border border-border rounded-lg p-4">
+              <h3 className="font-semibold text-text text-sm mb-4">角色權限</h3>
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b text-gray-400">
+                  <tr className="border-b text-text-muted">
                     <th className="text-left py-2 font-medium">角色</th>
                     <th className="text-center py-2 font-medium">檢視</th>
                     <th className="text-center py-2 font-medium">編輯</th>
@@ -466,8 +466,8 @@ export default function AdminPage() {
                       <td className={`py-2 text-center ${v ? "text-green-600" : "text-red-400"}`}>{v ? "V" : "X"}</td>
                     );
                     return (
-                      <tr key={role} className="border-b border-gray-50 last:border-b-0">
-                        <td className="py-2 text-gray-700 font-medium">{ROLE_LABELS[role]}</td>
+                      <tr key={role} className="border-b border-border-light last:border-b-0">
+                        <td className="py-2 text-text font-medium">{ROLE_LABELS[role]}</td>
                         {cell(perms.canView)}{cell(perms.canEdit)}{cell(perms.canComment)}{cell(perms.canManage)}
                       </tr>
                     );
@@ -489,15 +489,15 @@ export default function AdminPage() {
           <div className="max-w-4xl space-y-6">
             <div className="grid grid-cols-2 gap-4">
               {/* Department tree */}
-              <div className="bg-white border border-gray-200 rounded-lg p-4">
-                <h3 className="font-semibold text-gray-800 text-sm mb-3">部門架構</h3>
+              <div className="bg-surface border border-border rounded-lg p-4">
+                <h3 className="font-semibold text-text text-sm mb-3">部門架構</h3>
                 <div className="mb-3 max-h-[400px] overflow-y-auto">
                   {deptTree.map((node) => <DeptTreeItem key={node.id} node={node} depth={0} onAdd={addDeptChild} onRemove={removeDeptNode} onRename={renameDeptNode} />)}
                 </div>
                 <div className="flex gap-2">
                   <input type="text" value={newRoot} onChange={(e) => setNewRoot(e.target.value)}
                     onKeyDown={(e) => { if (e.key === "Enter" && newRoot.trim()) { setDeptTree([...deptTree, { id: `d-${Date.now()}`, name: newRoot.trim(), children: [] }]); setNewRoot(""); } }}
-                    placeholder="新增頂層部門..." className="flex-1 text-sm px-3 py-1.5 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-400" />
+                    placeholder="新增頂層部門..." className="flex-1 text-sm px-3 py-1.5 border border-border rounded focus:outline-none focus:ring-1 focus:ring-primary" />
                   <button onClick={() => { if (newRoot.trim()) { setDeptTree([...deptTree, { id: `d-${Date.now()}`, name: newRoot.trim(), children: [] }]); setNewRoot(""); } }}
                     className="px-3 py-1.5 bg-blue-500 text-white text-sm rounded hover:bg-blue-600"><Plus className="w-4 h-4" /></button>
                 </div>
@@ -517,16 +517,16 @@ export default function AdminPage() {
         {tab === "logs" && (
           <div className="max-w-2xl">
             <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2 text-sm text-gray-500">
+              <div className="flex items-center gap-2 text-sm text-text-secondary">
                 <History className="w-4 h-4" /> 共 {logs.length} 筆紀錄
               </div>
               {logs.length > 0 && (
                 <button onClick={() => { if (confirm("確定清除所有紀錄？")) clearLogs(); }} className="text-xs text-red-500 hover:text-red-600">清除全部</button>
               )}
             </div>
-            <div className="bg-white border border-gray-200 rounded-lg p-4">
+            <div className="bg-surface border border-border rounded-lg p-4">
               {logs.length === 0 ? (
-                <p className="text-sm text-gray-400 text-center py-8">尚無操作紀錄</p>
+                <p className="text-sm text-text-muted text-center py-8">尚無操作紀錄</p>
               ) : (
                 <div className="divide-y-0">{logs.map((log) => <LogEntry key={log.id} log={log} />)}</div>
               )}
@@ -537,12 +537,12 @@ export default function AdminPage() {
         {/* Version Control */}
         {tab === "versions" && (
           <div className="max-w-2xl">
-            <div className="flex items-center gap-2 mb-4 text-sm text-gray-500">
+            <div className="flex items-center gap-2 mb-4 text-sm text-text-secondary">
               <Clock className="w-4 h-4" /> 共 {snapshots.length} 個版本
             </div>
-            <div className="bg-white border border-gray-200 rounded-lg p-4">
+            <div className="bg-surface border border-border rounded-lg p-4">
               {snapshots.length === 0 ? (
-                <p className="text-sm text-gray-400 text-center py-8">
+                <p className="text-sm text-text-muted text-center py-8">
                   尚無版本快照<br /><span className="text-xs">在流程圖編輯模式點「存版本」建立</span>
                 </p>
               ) : (

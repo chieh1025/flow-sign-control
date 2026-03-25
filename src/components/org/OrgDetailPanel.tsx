@@ -43,8 +43,8 @@ export default function OrgDetailPanel() {
 
   if (!selectedNode || !data) {
     return (
-      <div className="w-72 border-l border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex items-center justify-center">
-        <p className="text-sm text-gray-400 dark:text-gray-500">
+      <div className="w-72 border-l border-border bg-surface flex items-center justify-center">
+        <p className="text-sm text-text-muted">
           點選節點查看詳情
         </p>
       </div>
@@ -52,13 +52,13 @@ export default function OrgDetailPanel() {
   }
 
   return (
-    <div className="w-72 border-l border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 overflow-y-auto">
+    <div className="w-72 border-l border-border bg-surface overflow-y-auto">
       {/* Header */}
-      <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
-        <h3 className="font-semibold text-sm text-gray-800 dark:text-gray-100">
+      <div className="px-4 py-3 border-b border-border-light">
+        <h3 className="font-semibold text-sm text-text">
           {data.label}
         </h3>
-        <span className="text-xs text-gray-400 dark:text-gray-500">
+        <span className="text-xs text-text-muted">
           {nodeTypeLabels[data.nodeType] || data.nodeType}
         </span>
       </div>
@@ -67,7 +67,7 @@ export default function OrgDetailPanel() {
       <div className="px-4 py-3 space-y-3">
         {/* Label */}
         <div>
-          <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+          <label className="block text-xs font-medium text-text-secondary mb-1">
             名稱
           </label>
           {editMode ? (
@@ -77,10 +77,10 @@ export default function OrgDetailPanel() {
               onChange={(e) =>
                 updateNodeData(selectedNode.id, { label: e.target.value })
               }
-              className="w-full px-2 py-1.5 text-sm border border-gray-200 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-400"
+              className="w-full px-2 py-1.5 text-sm border border-border rounded-md bg-surface text-text focus:outline-none focus:ring-1 focus:ring-primary"
             />
           ) : (
-            <p className="text-sm text-gray-800 dark:text-gray-100">
+            <p className="text-sm text-text">
               {data.label}
             </p>
           )}
@@ -88,7 +88,7 @@ export default function OrgDetailPanel() {
 
         {/* Node Type */}
         <div>
-          <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+          <label className="block text-xs font-medium text-text-secondary mb-1">
             類型
           </label>
           {editMode ? (
@@ -99,7 +99,7 @@ export default function OrgDetailPanel() {
                   nodeType: e.target.value as OrgNodeData["nodeType"],
                 })
               }
-              className="w-full px-2 py-1.5 text-sm border border-gray-200 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-400"
+              className="w-full px-2 py-1.5 text-sm border border-border rounded-md bg-surface text-text focus:outline-none focus:ring-1 focus:ring-primary"
             >
               {nodeTypeOptions.map((t) => (
                 <option key={t} value={t}>
@@ -108,7 +108,7 @@ export default function OrgDetailPanel() {
               ))}
             </select>
           ) : (
-            <p className="text-sm text-gray-800 dark:text-gray-100">
+            <p className="text-sm text-text">
               {nodeTypeLabels[data.nodeType]}
             </p>
           )}
@@ -116,7 +116,7 @@ export default function OrgDetailPanel() {
 
         {/* Title */}
         <div>
-          <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+          <label className="block text-xs font-medium text-text-secondary mb-1">
             職稱
           </label>
           {editMode ? (
@@ -129,10 +129,10 @@ export default function OrgDetailPanel() {
                 })
               }
               placeholder="如：廠長、副總"
-              className="w-full px-2 py-1.5 text-sm border border-gray-200 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 placeholder:text-gray-300 dark:placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-400"
+              className="w-full px-2 py-1.5 text-sm border border-border rounded-md bg-surface text-text placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-primary"
             />
           ) : (
-            <p className="text-sm text-gray-800 dark:text-gray-100">
+            <p className="text-sm text-text">
               {data.title || "-"}
             </p>
           )}
@@ -140,7 +140,7 @@ export default function OrgDetailPanel() {
 
         {/* Holder */}
         <div>
-          <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+          <label className="block text-xs font-medium text-text-secondary mb-1">
             現任
           </label>
           {editMode ? (
@@ -153,10 +153,10 @@ export default function OrgDetailPanel() {
                 })
               }
               placeholder="如：王小明"
-              className="w-full px-2 py-1.5 text-sm border border-gray-200 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 placeholder:text-gray-300 dark:placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-400"
+              className="w-full px-2 py-1.5 text-sm border border-border rounded-md bg-surface text-text placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-primary"
             />
           ) : (
-            <p className="text-sm text-gray-800 dark:text-gray-100">
+            <p className="text-sm text-text">
               {data.holder || "-"}
             </p>
           )}
@@ -164,7 +164,7 @@ export default function OrgDetailPanel() {
 
         {/* Headcount */}
         <div>
-          <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+          <label className="block text-xs font-medium text-text-secondary mb-1">
             編制人數
           </label>
           {editMode ? (
@@ -180,10 +180,10 @@ export default function OrgDetailPanel() {
                 })
               }
               placeholder="0"
-              className="w-full px-2 py-1.5 text-sm border border-gray-200 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 placeholder:text-gray-300 dark:placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-400"
+              className="w-full px-2 py-1.5 text-sm border border-border rounded-md bg-surface text-text placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-primary"
             />
           ) : (
-            <p className="text-sm text-gray-800 dark:text-gray-100">
+            <p className="text-sm text-text">
               {data.headcount ?? "-"}
             </p>
           )}
@@ -191,19 +191,19 @@ export default function OrgDetailPanel() {
       </div>
 
       {/* Relationships */}
-      <div className="px-4 py-3 border-t border-gray-100 dark:border-gray-800 space-y-2">
-        <h4 className="text-xs font-medium text-gray-500 dark:text-gray-400">
+      <div className="px-4 py-3 border-t border-border-light space-y-2">
+        <h4 className="text-xs font-medium text-text-secondary">
           關係
         </h4>
 
         {parentNode && (
           <div>
-            <span className="text-xs text-gray-400 dark:text-gray-500">
+            <span className="text-xs text-text-muted">
               上層：
             </span>
             <button
               onClick={() => setSelectedNodeId(parentNode.id)}
-              className="text-xs text-blue-500 hover:underline"
+              className="text-xs text-primary hover:underline"
             >
               {(parentNode.data as unknown as OrgNodeData).label}
             </button>
@@ -212,7 +212,7 @@ export default function OrgDetailPanel() {
 
         {childNodes.length > 0 && (
           <div>
-            <span className="text-xs text-gray-400 dark:text-gray-500">
+            <span className="text-xs text-text-muted">
               下層 ({childNodes.length})：
             </span>
             <div className="flex flex-wrap gap-1 mt-1">
@@ -222,7 +222,7 @@ export default function OrgDetailPanel() {
                     <button
                       key={child.id}
                       onClick={() => setSelectedNodeId(child.id)}
-                      className="text-xs px-2 py-0.5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
+                      className="text-xs px-2 py-0.5 bg-surface-hover text-text-secondary rounded hover:bg-surface-hover"
                     >
                       {(child.data as unknown as OrgNodeData).label}
                     </button>
@@ -235,7 +235,7 @@ export default function OrgDetailPanel() {
 
       {/* Delete */}
       {editMode && (
-        <div className="px-4 py-3 border-t border-gray-100 dark:border-gray-800">
+        <div className="px-4 py-3 border-t border-border-light">
           <button
             onClick={() => {
               if (confirm(`確定刪除「${data.label}」？其下屬連結也會一併移除。`)) {

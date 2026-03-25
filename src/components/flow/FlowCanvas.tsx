@@ -27,7 +27,7 @@ const defaultEdgeOptions = {
 };
 
 const btnClass =
-  "px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 shadow-sm";
+  "px-3 py-1.5 bg-surface border border-border rounded-md text-xs text-text-secondary hover:bg-surface-hover shadow-sm";
 
 function FlowCanvasInner() {
   const nodes = useFSCStore((s) => s.nodes);
@@ -199,14 +199,14 @@ function FlowCanvasInner() {
         elementsSelectable
         fitView
         fitViewOptions={{ padding: 0.3 }}
-        className="bg-gray-50 dark:bg-gray-950"
+        className="bg-background"
       >
-        <Background gap={20} size={1} color="#e5e7eb" className="dark:!stroke-gray-800" />
+        <Background gap={20} size={1} color="#e5e7eb" className="dark:[&_circle]:fill-slate-700" />
         <Controls position="bottom-right" />
         <MiniMap
           position="bottom-left"
           nodeStrokeWidth={2}
-          className="!bg-white dark:!bg-gray-800 !border-gray-200 dark:!border-gray-700"
+          className="!bg-surface !border-border"
           maskColor="rgba(0,0,0,0.08)"
         />
       </ReactFlow>

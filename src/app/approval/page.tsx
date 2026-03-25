@@ -56,29 +56,29 @@ export default function ApprovalPage() {
   return (
     <div className="flex h-screen overflow-hidden">
       <Sidebar />
-      <div className="flex-1 overflow-y-auto p-6">
-        <h1 className="text-xl font-bold text-gray-800 mb-6">核決權限總表</h1>
+      <div className="flex-1 overflow-y-auto p-6 bg-background">
+        <h1 className="text-xl font-bold text-text mb-6">核決權限總表</h1>
 
         {/* Warnings */}
         {warnings.length > 0 && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <h3 className="text-sm font-semibold text-red-700 mb-2">警示</h3>
+          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+            <h3 className="text-sm font-semibold text-red-700 dark:text-red-400 mb-2">警示</h3>
             {warnings.map((w, i) => (
-              <p key={i} className="text-sm text-red-600">- {w}</p>
+              <p key={i} className="text-sm text-red-600 dark:text-red-400">- {w}</p>
             ))}
           </div>
         )}
 
         {/* Approval table per node */}
-        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <div className="bg-surface border border-border rounded-lg overflow-hidden">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-gray-50 border-b">
-                <th className="text-left px-4 py-3 font-medium text-gray-500">流程節點</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-500">金額範圍</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-500">職級</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-500">人員</th>
-                <th className="text-center px-4 py-3 font-medium text-gray-500">動作</th>
+              <tr className="bg-surface-hover border-b">
+                <th className="text-left px-4 py-3 font-medium text-text-secondary">流程節點</th>
+                <th className="text-left px-4 py-3 font-medium text-text-secondary">金額範圍</th>
+                <th className="text-left px-4 py-3 font-medium text-text-secondary">職級</th>
+                <th className="text-left px-4 py-3 font-medium text-text-secondary">人員</th>
+                <th className="text-center px-4 py-3 font-medium text-text-secondary">動作</th>
               </tr>
             </thead>
             <tbody>
@@ -86,16 +86,16 @@ export default function ApprovalPage() {
                 const d = node.data as unknown as ProcessNodeData;
                 if (d.approvalAuthorities.length === 0) return null;
                 return d.approvalAuthorities.map((a, i) => (
-                  <tr key={`${node.id}-${a.id}`} className="border-b border-gray-50 hover:bg-gray-50">
+                  <tr key={`${node.id}-${a.id}`} className="border-b border-border-light hover:bg-surface-hover">
                     {i === 0 && (
                       <td
-                        className="px-4 py-2.5 font-medium text-gray-800"
+                        className="px-4 py-2.5 font-medium text-text"
                         rowSpan={d.approvalAuthorities.length}
                       >
                         {d.label}
                       </td>
                     )}
-                    <td className="px-4 py-2.5 text-gray-600">
+                    <td className="px-4 py-2.5 text-text-secondary">
                       {a.isNA
                         ? "N/A"
                         : a.amountMin && a.amountMax
@@ -106,16 +106,16 @@ export default function ApprovalPage() {
                               ? `> ${formatAmount(a.amountMin)}`
                               : "-"}
                     </td>
-                    <td className="px-4 py-2.5 text-gray-700 font-medium">{a.level}</td>
-                    <td className="px-4 py-2.5 text-gray-600">{a.levelPerson}</td>
+                    <td className="px-4 py-2.5 text-text font-medium">{a.level}</td>
+                    <td className="px-4 py-2.5 text-text-secondary">{a.levelPerson}</td>
                     <td className="px-4 py-2.5 text-center">
                       <span
                         className={`inline-block px-2 py-0.5 rounded text-xs font-bold ${
                           a.action === "approve"
-                            ? "bg-red-100 text-red-700"
+                            ? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400"
                             : a.action === "review"
-                              ? "bg-yellow-100 text-yellow-700"
-                              : "bg-blue-100 text-blue-700"
+                              ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400"
+                              : "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400"
                         }`}
                       >
                         {actionLabel(a.action)}
@@ -129,29 +129,29 @@ export default function ApprovalPage() {
         </div>
 
         {/* By Level View */}
-        <h2 className="text-lg font-bold text-gray-800 mt-8 mb-4">依核決分級檢視</h2>
+        <h2 className="text-lg font-bold text-text mt-8 mb-4">依核決分級檢視</h2>
         <div className="space-y-4">
           {Array.from(levelMap.entries()).map(([level, items]) => (
-            <div key={level} className="bg-white border border-gray-200 rounded-lg p-4">
-              <h3 className="font-semibold text-gray-800 mb-2">
+            <div key={level} className="bg-surface border border-border rounded-lg p-4">
+              <h3 className="font-semibold text-text mb-2">
                 {level}
-                <span className="text-gray-400 text-sm font-normal ml-2">
+                <span className="text-text-muted text-sm font-normal ml-2">
                   ({items.length} 個節點)
                 </span>
               </h3>
               <div className="space-y-1">
                 {items.map((item, i) => (
-                  <div key={i} className="text-sm text-gray-600 flex gap-2">
-                    <span className="text-gray-400">-</span>
+                  <div key={i} className="text-sm text-text-secondary flex gap-2">
+                    <span className="text-text-muted">-</span>
                     <span>{item.nodeName}</span>
-                    <span className="text-gray-400">/ {item.authority.levelPerson}</span>
+                    <span className="text-text-muted">/ {item.authority.levelPerson}</span>
                     <span
                       className={`px-1.5 py-0 rounded text-[10px] font-bold ${
                         item.authority.action === "approve"
-                          ? "bg-red-100 text-red-700"
+                          ? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400"
                           : item.authority.action === "review"
-                            ? "bg-yellow-100 text-yellow-700"
-                            : "bg-blue-100 text-blue-700"
+                            ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400"
+                            : "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400"
                       }`}
                     >
                       {actionLabel(item.authority.action)}

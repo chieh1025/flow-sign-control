@@ -10,10 +10,14 @@ import {
   Network,
   PanelLeftClose,
   PanelLeft,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useFSCStore } from "@/store/fsc-store";
 import { ROLE_LABELS, type Role } from "@/types/fsc";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 const menuItems = [
   { href: "/", label: "儀表板", icon: LayoutDashboard, exact: true },
@@ -29,25 +33,29 @@ export default function Sidebar() {
   const setCollapsed = useFSCStore((s) => s.setSidebarCollapsed);
   const currentRole = useFSCStore((s) => s.currentRole);
   const setCurrentRole = useFSCStore((s) => s.setCurrentRole);
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
 
   return (
     <div
       className={cn(
-        "flex flex-col border-r border-gray-200 bg-white transition-all duration-200",
+        "flex flex-col border-r border-border bg-sidebar transition-all duration-200",
         collapsed ? "w-16" : "w-52"
       )}
     >
       {/* Logo */}
-      <div className="flex items-center justify-between h-14 px-4 border-b border-gray-100">
+      <div className="flex items-center justify-between h-14 px-4 border-b border-border-light">
         {!collapsed && (
           <div className="flex flex-col leading-tight">
-            <span className="font-bold text-sm text-gray-800 tracking-tight">FSC 流程核決控制平台</span>
-            <span className="text-[9px] text-gray-400 tracking-wider">Flow & Sign & Control</span>
+            <span className="font-bold text-sm text-text tracking-tight">FSC 流程核決控制平台</span>
+            <span className="text-[9px] text-text-muted tracking-wider">Flow & Sign & Control</span>
           </div>
         )}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="p-1.5 rounded-md hover:bg-gray-100 text-gray-400"
+          className="p-1.5 rounded-md hover:bg-surface-hover text-text-muted transition-colors"
         >
           {collapsed ? <PanelLeft className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
         </button>
@@ -67,12 +75,12 @@ export default function Sidebar() {
               className={cn(
                 "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors",
                 isActive
-                  ? "bg-blue-50 text-blue-700 font-medium"
-                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                  ? "bg-primary-bg text-primary font-medium"
+                  : "text-text-secondary hover:bg-surface-hover hover:text-text"
               )}
               title={collapsed ? item.label : undefined}
             >
-              <item.icon className={cn("w-4 h-4 flex-shrink-0", isActive && "text-blue-600")} />
+              <item.icon className={cn("w-4 h-4 flex-shrink-0", isActive && "text-primary")} />
               {!collapsed && <span>{item.label}</span>}
             </Link>
           );
@@ -80,15 +88,29 @@ export default function Sidebar() {
       </nav>
 
       {/* Role + Theme toggle + Footer */}
-      <div className="border-t border-gray-100">
+      <div className="border-t border-border-light">
+        {/* Theme toggle */}
+        {mounted && (
+          <div className={cn("flex items-center border-b border-border-light", collapsed ? "justify-center py-2.5" : "px-4 py-2.5")}>
+            {!collapsed && <span className="text-[10px] text-text-muted mr-auto">主題</span>}
+            <button
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="p-1.5 rounded-md hover:bg-surface-hover text-text-muted transition-colors"
+              title={theme === "dark" ? "切換亮色" : "切換暗色"}
+            >
+              {theme === "dark" ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
+            </button>
+          </div>
+        )}
+
         {/* Role selector */}
         {!collapsed ? (
-          <div className="px-4 py-2.5 border-b border-gray-100">
-            <label className="text-[10px] text-gray-400 block mb-1">目前角色</label>
+          <div className="px-4 py-2.5 border-b border-border-light">
+            <label className="text-[10px] text-text-muted block mb-1">目前角色</label>
             <select
               value={currentRole}
               onChange={(e) => setCurrentRole(e.target.value as Role)}
-              className="w-full text-xs px-2 py-1.5 border border-gray-200 rounded bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-400"
+              className="w-full text-xs px-2 py-1.5 border border-border rounded bg-surface text-text focus:outline-none focus:ring-1 focus:ring-primary"
             >
               {(Object.keys(ROLE_LABELS) as Role[]).map((r) => (
                 <option key={r} value={r}>{ROLE_LABELS[r]}</option>
@@ -96,12 +118,12 @@ export default function Sidebar() {
             </select>
           </div>
         ) : (
-          <div className="flex justify-center py-2.5 border-b border-gray-100" title={`角色: ${ROLE_LABELS[currentRole]}`}>
-            <span className="text-[10px] font-medium text-gray-500">{ROLE_LABELS[currentRole]}</span>
+          <div className="flex justify-center py-2.5 border-b border-border-light" title={`角色: ${ROLE_LABELS[currentRole]}`}>
+            <span className="text-[10px] font-medium text-text-muted">{ROLE_LABELS[currentRole]}</span>
           </div>
         )}
         {!collapsed && (
-          <div className="px-4 py-3 text-[10px] text-gray-400">
+          <div className="px-4 py-3 text-[10px] text-text-muted">
             <div>FSC v0.1</div>
             <div className="mt-0.5">by YC Chen</div>
           </div>

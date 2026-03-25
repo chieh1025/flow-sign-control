@@ -89,19 +89,19 @@ export default function AlertsPage() {
   return (
     <div className="flex h-screen overflow-hidden">
       <Sidebar />
-      <div className="flex-1 overflow-y-auto p-6">
-        <h1 className="text-xl font-bold text-gray-800 mb-6">
+      <div className="flex-1 overflow-y-auto p-6 bg-background">
+        <h1 className="text-xl font-bold text-text mb-6">
           警示中心
           {alerts.length > 0 && (
-            <span className="ml-2 text-sm font-normal text-red-500">
+            <span className="ml-2 text-sm font-normal text-red-500 dark:text-red-400">
               ({alerts.length} 個問題)
             </span>
           )}
         </h1>
 
         {alerts.length === 0 ? (
-          <div className="text-center py-16 text-gray-400">
-            <AlertTriangle className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+          <div className="text-center py-16 text-text-muted">
+            <AlertTriangle className="w-12 h-12 mx-auto mb-4 text-text-muted" />
             <p className="text-lg">沒有警示</p>
             <p className="text-sm mt-1">所有流程節點的核決權限設定正常</p>
           </div>
@@ -112,13 +112,13 @@ export default function AlertsPage() {
                 key={i}
                 className={`flex items-start gap-3 p-4 rounded-lg border ${
                   alert.type === "error"
-                    ? "bg-red-50 border-red-200"
-                    : "bg-yellow-50 border-yellow-200"
+                    ? "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800"
+                    : "bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800"
                 }`}
               >
                 <div
                   className={`mt-0.5 ${
-                    alert.type === "error" ? "text-red-500" : "text-yellow-500"
+                    alert.type === "error" ? "text-red-500 dark:text-red-400" : "text-yellow-500 dark:text-yellow-400"
                   }`}
                 >
                   {alert.icon}
@@ -126,14 +126,14 @@ export default function AlertsPage() {
                 <div>
                   <h3
                     className={`text-sm font-semibold ${
-                      alert.type === "error" ? "text-red-700" : "text-yellow-700"
+                      alert.type === "error" ? "text-red-700 dark:text-red-400" : "text-yellow-700 dark:text-yellow-400"
                     }`}
                   >
                     {alert.title}
                   </h3>
                   <p
                     className={`text-xs mt-0.5 ${
-                      alert.type === "error" ? "text-red-600" : "text-yellow-600"
+                      alert.type === "error" ? "text-red-600 dark:text-red-400" : "text-yellow-600 dark:text-yellow-400"
                     }`}
                   >
                     {alert.detail}

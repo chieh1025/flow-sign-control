@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils";
 const nodeTypes = { orgNode: OrgNodeComponent };
 
 const btnClass =
-  "px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 shadow-sm";
+  "px-3 py-1.5 bg-surface border border-border rounded-md text-xs text-text-secondary hover:bg-surface-hover shadow-sm";
 
 function OrgCanvasInner() {
   const nodes = useOrgStore((s) => s.nodes);
@@ -65,7 +65,7 @@ function OrgCanvasInner() {
             "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs shadow-sm border",
             editMode
               ? "bg-blue-500 text-white border-blue-500 hover:bg-blue-600"
-              : "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+              : "bg-surface border-border text-text-secondary hover:bg-surface-hover"
           )}
         >
           {editMode ? <><Pencil className="w-3.5 h-3.5" /> 編輯中</> : <><Eye className="w-3.5 h-3.5" /> 檢視</>}
@@ -97,14 +97,14 @@ function OrgCanvasInner() {
         elementsSelectable
         fitView
         fitViewOptions={{ padding: 0.2 }}
-        className="bg-gray-50 dark:bg-gray-950"
+        className="bg-background"
       >
         <Background gap={20} size={1} color="#e5e7eb" />
         <Controls position="bottom-right" />
         <MiniMap
           position="bottom-left"
           nodeStrokeWidth={2}
-          className="!bg-white dark:!bg-gray-800 !border-gray-200 dark:!border-gray-700"
+          className="!bg-surface !border-border"
           maskColor="rgba(0,0,0,0.08)"
         />
       </ReactFlow>
