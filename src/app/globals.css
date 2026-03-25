@@ -20,7 +20,7 @@
 }
 
 .dark {
-  --background: #0B1120;
+  --background: #0F1628;
   --foreground: #F1F5F9;
   --surface: #131B2E;
   --surface-hover: #1C2640;
@@ -76,11 +76,11 @@ body {
 }
 
 .react-flow__edge-path {
-  stroke: var(--text-muted);
+  stroke: var(--text-secondary);
 }
 .react-flow__arrowhead polyline {
-  stroke: var(--text-muted);
-  fill: var(--text-muted);
+  stroke: var(--text-secondary);
+  fill: var(--text-secondary);
 }
 
 .react-flow__edge-text {

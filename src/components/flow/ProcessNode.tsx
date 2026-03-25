@@ -7,23 +7,22 @@ import { cn } from "@/lib/utils";
 import { useFSCStore } from "@/store/fsc-store";
 import { MessageSquare } from "lucide-react";
 
-// ── Node type visual config ──
+// ── Node styles — solid backgrounds, clear in both modes ──
 const nodeTypeStyles: Record<string, string> = {
-  start: "rounded-3xl border-emerald-400 dark:border-emerald-500 bg-emerald-50/80 dark:bg-emerald-950/40",
-  end: "rounded-3xl border-orange-400 dark:border-orange-500 bg-orange-50/80 dark:bg-orange-950/40",
-  task: "rounded-lg border-border bg-surface",
-  decision: "rounded-lg border-violet-400 dark:border-violet-500 bg-violet-50/60 dark:bg-violet-950/30 rotate-0",
-  connector: "rounded-full border-amber-400 dark:border-amber-500 bg-amber-50/80 dark:bg-amber-950/40",
+  start: "rounded-3xl border-emerald-400 dark:border-emerald-500 bg-emerald-50 dark:bg-emerald-900/80",
+  end: "rounded-3xl border-orange-400 dark:border-orange-500 bg-orange-50 dark:bg-orange-900/80",
+  task: "rounded-lg border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800",
+  decision: "rounded-lg border-violet-400 dark:border-violet-400 bg-violet-50 dark:bg-violet-900/70",
+  connector: "rounded-full border-amber-400 dark:border-amber-500 bg-amber-50 dark:bg-amber-900/80",
 };
 
 const signMethodLabel: Record<string, { text: string; color: string }> = {
-  system_sign: { text: "系統簽", color: "bg-emerald-100/80 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" },
-  paper_sign: { text: "紙本簽", color: "bg-orange-100/80 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400" },
-  both: { text: "系統+紙本", color: "bg-sky-100/80 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400" },
+  system_sign: { text: "系統簽", color: "bg-emerald-100 text-emerald-800 dark:bg-emerald-800/60 dark:text-emerald-300" },
+  paper_sign: { text: "紙本簽", color: "bg-orange-100 text-orange-800 dark:bg-orange-800/60 dark:text-orange-300" },
+  both: { text: "系統+紙本", color: "bg-sky-100 text-sky-800 dark:bg-sky-800/60 dark:text-sky-300" },
 };
 
-// ── Handle shared class ──
-const handleClass = "!w-2 !h-2 !bg-text-muted hover:!bg-primary !border-[1.5px] !border-surface transition-colors";
+const handleClass = "!w-2 !h-2 !bg-slate-400 dark:!bg-slate-500 hover:!bg-blue-500 !border-[1.5px] !border-white dark:!border-slate-800 transition-colors";
 
 function StatusBadge({ label, color }: { label: string; color: string }) {
   return (
@@ -57,18 +56,19 @@ function ProcessNodeComponent({ id, data, selected }: NodeProps) {
 
       <div
         className={cn(
-          "relative border-2 px-3 py-2 w-[220px] transition-all duration-150",
-          "shadow-sm hover:shadow-md hover:border-primary/40",
-          "cursor-pointer",
+          "relative border-2 px-3 py-2 w-[220px] transition-all duration-150 cursor-pointer",
+          "shadow-[0_1px_3px_rgba(0,0,0,0.08)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.4)]",
+          "hover:shadow-[0_4px_12px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_4px_16px_rgba(0,0,0,0.5)]",
+          "hover:border-blue-400/50 dark:hover:border-blue-400/50",
           style,
-          isSelected && "ring-2 ring-primary/60 ring-offset-1 ring-offset-background shadow-md"
+          isSelected && "ring-2 ring-blue-400 dark:ring-blue-500 ring-offset-2 ring-offset-white dark:ring-offset-slate-900 shadow-[0_4px_12px_rgba(0,0,0,0.15)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.5)]"
         )}
       >
         {/* Badges row */}
         {hasBadges && (
           <div className="flex flex-wrap gap-1 mb-1">
             {nodeData.operatingSystem && (
-              <StatusBadge label={nodeData.operatingSystem} color="bg-sky-100/80 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400" />
+              <StatusBadge label={nodeData.operatingSystem} color="bg-sky-100 text-sky-800 dark:bg-sky-800/60 dark:text-sky-300" />
             )}
             {nodeData.signMethod && signMethodLabel[nodeData.signMethod] && (
               <StatusBadge
@@ -77,26 +77,26 @@ function ProcessNodeComponent({ id, data, selected }: NodeProps) {
               />
             )}
             {nodeData.status.vacant && (
-              <StatusBadge label="缺人" color="bg-red-100/80 text-red-700 dark:bg-red-900/30 dark:text-red-400" />
+              <StatusBadge label="缺人" color="bg-red-100 text-red-800 dark:bg-red-800/60 dark:text-red-300" />
             )}
             {nodeData.status.unsigned && (
-              <StatusBadge label="未簽" color="bg-amber-100/80 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400" />
+              <StatusBadge label="未簽" color="bg-amber-100 text-amber-800 dark:bg-amber-800/60 dark:text-amber-300" />
             )}
             {nodeData.status.paperSign && (
-              <StatusBadge label="紙本簽" color="bg-surface-hover text-text-muted" />
+              <StatusBadge label="紙本簽" color="bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300" />
             )}
             {nodeData.status.other && (
-              <StatusBadge label={nodeData.status.other} color="bg-surface-hover text-text-muted" />
+              <StatusBadge label={nodeData.status.other} color="bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300" />
             )}
           </div>
         )}
 
         {/* Node name */}
-        <div className="font-medium text-[13px] text-text leading-tight">{nodeData.label}</div>
+        <div className="font-medium text-[13px] text-slate-800 dark:text-slate-100 leading-tight">{nodeData.label}</div>
 
         {/* Top approval summary */}
         {topApproval && (
-          <div className="text-[11px] text-text-muted mt-0.5 leading-tight">
+          <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-tight">
             {topApproval.amountMax
               ? `≤ ${(topApproval.amountMax / 10000).toFixed(0)}萬 `
               : ""}

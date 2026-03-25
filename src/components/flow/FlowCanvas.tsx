@@ -22,8 +22,8 @@ const nodeTypes = {
 };
 
 const defaultEdgeOptions = {
-  markerEnd: { type: MarkerType.ArrowClosed, width: 14, height: 14 },
-  style: { strokeWidth: 1.5 },
+  markerEnd: { type: MarkerType.ArrowClosed, width: 16, height: 16 },
+  style: { strokeWidth: 2 },
 };
 
 // ── Toolbar button styles ──
