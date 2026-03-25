@@ -133,8 +133,8 @@ function FlowCanvasInner() {
             className={cn(
               "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs shadow-sm border",
               editMode
-                ? "bg-blue-500 text-white border-blue-500 hover:bg-blue-600"
-                : "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                ? "bg-primary text-white border-primary hover:opacity-90"
+                : "bg-surface border-border text-text-secondary hover:bg-surface-hover"
             )}
           >
             {editMode ? <><Pencil className="w-3.5 h-3.5" /> 編輯中</> : <><Eye className="w-3.5 h-3.5" /> 檢視</>}
@@ -201,7 +201,7 @@ function FlowCanvasInner() {
         fitViewOptions={{ padding: 0.3 }}
         className="bg-background"
       >
-        <Background gap={20} size={1} color="#e5e7eb" className="dark:[&_circle]:fill-slate-700" />
+        <Background gap={20} size={1} color="var(--border)" />
         <Controls position="bottom-right" />
         <MiniMap
           position="bottom-left"
