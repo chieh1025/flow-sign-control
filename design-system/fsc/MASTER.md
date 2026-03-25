@@ -92,6 +92,36 @@
 - **Font:** Geist Sans (already configured)
 - **Body size:** 14px (text-sm for data-dense UI)
 - **Heading weight:** 600-700
+- **Font size hierarchy:** label 13px > body 12px > meta 11px > badge 10px
+
+---
+
+## Interaction Patterns (ui-ux-pro-max)
+
+### Hover Feedback
+- All interactive elements must have `cursor-pointer`
+- Cards/nodes: `hover:shadow-md hover:border-primary/40` with `transition-all duration-150`
+- Buttons: `hover:bg-surface-hover hover:text-text`
+- No scale transforms (避免 layout shift)
+
+### Floating Toolbars
+- Glassmorphism: `bg-surface/70 backdrop-blur-md border-border/60 shadow-lg rounded-xl`
+- Button groups separated by `w-px h-5 bg-border` dividers
+- Active state: `bg-primary text-white`
+- z-index: use z-10, never z-[9999]
+
+### Edit Mode Visual Cues
+- Canvas background tints: `bg-primary-bg/30`
+- Grid dots change to primary color at lower opacity
+- Bottom center pill indicator: `bg-primary/10 border-primary/20 text-primary`
+
+### Color Opacity Convention
+- Light mode semantic bg: use `/80` (e.g., `bg-emerald-50/80`)
+- Dark mode semantic bg: use `/30`~`/40` (e.g., `dark:bg-emerald-950/40`)
+- This keeps node backgrounds subtle and non-competing with text
+
+### MiniMap
+- `!bg-surface/80 !backdrop-blur-sm !border-border !rounded-lg !shadow-lg`
 
 ---
 
@@ -100,17 +130,24 @@
 - No hardcoded background/text colors — use CSS variables via dark: classes
 - No missing `dark:` counterparts when using color classes
 - No emojis as icons — use lucide-react
-- No layout-shifting hover effects
+- No layout-shifting hover effects (no scale transforms)
 - Transitions: 150-200ms for all interactive states
+- No arbitrary z-index (9999) — use defined scale (10, 20, 30, 50)
+- No hover-only interactions — critical actions must be click/tap accessible
 
 ---
 
 ## Pre-Delivery Checklist
 
-- [ ] Every `bg-*` has a `dark:bg-*` counterpart
-- [ ] Every `text-*` has a `dark:text-*` counterpart
-- [ ] Every `border-*` has a `dark:border-*` counterpart
+- [ ] Every `bg-*` has a `dark:bg-*` counterpart (or uses CSS variable class)
+- [ ] Every `text-*` has a `dark:text-*` counterpart (or uses CSS variable class)
+- [ ] Every `border-*` has a `dark:border-*` counterpart (or uses CSS variable class)
 - [ ] Theme toggle works in sidebar
 - [ ] All pages render correctly in both modes
 - [ ] React Flow canvas adapts to theme
 - [ ] No FOUC (flash of unstyled content) on load
+- [ ] All clickable elements have `cursor-pointer`
+- [ ] Hover states with smooth transitions (150ms)
+- [ ] Focus states visible for keyboard navigation
+- [ ] Floating toolbars use glassmorphism pattern
+- [ ] Edit mode has clear visual indicator on canvas
